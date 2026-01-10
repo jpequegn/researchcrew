@@ -1,0 +1,10 @@
+{"query": "What are the main AI agent frameworks in 2025?", "expected_topics": ["LangGraph", "CrewAI", "Google ADK", "Microsoft Agent Framework"], "min_sources": 3, "difficulty": "medium"}
+{"query": "Explain circuit breaker patterns for agents", "expected_topics": ["fault tolerance", "retry", "fallback", "failure threshold"], "min_sources": 2, "difficulty": "medium"}
+{"query": "What is the Model Context Protocol (MCP)?", "expected_topics": ["tool interoperability", "Anthropic", "composability"], "min_sources": 2, "difficulty": "easy"}
+{"query": "How do you implement retry with exponential backoff?", "expected_topics": ["exponential", "jitter", "max attempts", "delay"], "min_sources": 1, "difficulty": "easy"}
+{"query": "Compare LangGraph vs Google ADK for multi-agent systems", "expected_topics": ["orchestration", "graph-based", "Vertex AI", "state management"], "min_sources": 3, "difficulty": "hard"}
+{"query": "What are best practices for agent memory management?", "expected_topics": ["short-term", "long-term", "context window", "RAG"], "min_sources": 2, "difficulty": "medium"}
+{"query": "How should agents be tested and evaluated?", "expected_topics": ["evals", "golden datasets", "metrics", "CI/CD"], "min_sources": 2, "difficulty": "medium"}
+{"query": "What observability tools exist for AI agents?", "expected_topics": ["LangSmith", "tracing", "OpenTelemetry", "monitoring"], "min_sources": 2, "difficulty": "easy"}
+{"query": "Explain the supervisor pattern in multi-agent systems", "expected_topics": ["orchestration", "delegation", "coordination", "hierarchy"], "min_sources": 2, "difficulty": "medium"}
+{"query": "How do you deploy agents to production?", "expected_topics": ["containerization", "Vertex AI", "scaling", "security"], "min_sources": 2, "difficulty": "hard"}

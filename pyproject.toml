@@ -1,0 +1,53 @@
+[project]
+name = "researchcrew"
+version = "0.1.0"
+description = "Multi-agent research assistant built with Google ADK"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+    { name = "Julien" }
+]
+
+dependencies = [
+    "google-adk>=0.1.0",
+    "httpx>=0.25.0",
+    "beautifulsoup4>=4.12.0",
+    "tenacity>=8.2.0",
+    "pydantic>=2.5.0",
+    "python-dotenv>=1.0.0",
+    "pyyaml>=6.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "deepeval>=0.21.0",
+    "ruff>=0.1.0",
+    "mypy>=1.7.0",
+]
+observability = [
+    "opentelemetry-api>=1.21.0",
+    "opentelemetry-sdk>=1.21.0",
+    "opentelemetry-exporter-otlp>=1.21.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

@@ -1,0 +1,53 @@
+# Development Configuration
+# Used for local development and testing
+
+environment: development
+
+# Model configuration
+models:
+  orchestrator: gemini-2.0-flash
+  researcher: gemini-2.0-flash
+  synthesizer: gemini-2.0-flash
+  fact_checker: gemini-2.0-flash
+  writer: gemini-2.0-flash
+
+# Tool settings
+tools:
+  web_search:
+    enabled: true
+    max_queries_per_task: 3
+    timeout_seconds: 30
+  read_url:
+    enabled: true
+    max_content_length: 10000
+    timeout_seconds: 30
+
+# Memory settings
+memory:
+  session_memory: true
+  long_term_memory: false  # Disabled in dev
+  context_limit_tokens: 100000
+
+# Quality settings
+quality:
+  require_source_attribution: true
+  require_confidence_scores: true
+  require_fact_checking: true
+
+# Performance settings
+performance:
+  max_parallel_researchers: 3
+  simple_query_timeout_seconds: 60
+  complex_query_timeout_seconds: 180
+
+# Retry settings
+retry:
+  max_attempts: 3
+  initial_delay_seconds: 1
+  max_delay_seconds: 60
+  exponential_base: 2
+
+# Logging
+logging:
+  level: DEBUG
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"

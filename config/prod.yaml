@@ -1,0 +1,80 @@
+# Production Configuration
+# Used for deployed production system
+
+environment: production
+
+# Model configuration
+models:
+  orchestrator: gemini-2.0-flash
+  researcher: gemini-2.0-flash
+  synthesizer: gemini-2.0-flash
+  fact_checker: gemini-2.0-flash
+  writer: gemini-2.0-flash
+  # Fallback models
+  fallback:
+    orchestrator: gemini-1.5-pro
+    researcher: gemini-1.5-flash
+    synthesizer: gemini-1.5-pro
+    fact_checker: gemini-1.5-flash
+    writer: gemini-1.5-pro
+
+# Tool settings
+tools:
+  web_search:
+    enabled: true
+    max_queries_per_task: 3
+    timeout_seconds: 30
+  read_url:
+    enabled: true
+    max_content_length: 10000
+    timeout_seconds: 30
+
+# Memory settings
+memory:
+  session_memory: true
+  long_term_memory: true
+  context_limit_tokens: 100000
+  vector_db:
+    provider: vertex_ai_vector_search
+    index_name: researchcrew-knowledge
+
+# Quality settings
+quality:
+  require_source_attribution: true
+  require_confidence_scores: true
+  require_fact_checking: true
+  min_accuracy_threshold: 0.8
+
+# Performance settings
+performance:
+  max_parallel_researchers: 5
+  simple_query_timeout_seconds: 60
+  complex_query_timeout_seconds: 180
+
+# Retry settings
+retry:
+  max_attempts: 3
+  initial_delay_seconds: 1
+  max_delay_seconds: 60
+  exponential_base: 2
+  jitter: true
+
+# Circuit breaker settings
+circuit_breaker:
+  failure_threshold: 3
+  reset_timeout_seconds: 60
+  half_open_requests: 1
+
+# Observability
+observability:
+  tracing:
+    enabled: true
+    exporter: cloud_trace
+  metrics:
+    enabled: true
+    exporter: cloud_monitoring
+
+# Logging
+logging:
+  level: WARNING
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
