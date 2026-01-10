@@ -6,6 +6,7 @@ Web search and URL reading tools for research agents.
 import httpx
 from bs4 import BeautifulSoup
 from google.adk import tool
+from urllib.parse import quote_plus
 
 
 @tool
@@ -18,27 +19,45 @@ def web_search(query: str) -> str:
     Returns:
         Search results with titles, snippets, and URLs.
     """
-    # TODO: Implement with Google Custom Search API or similar
-    # For now, return a placeholder that indicates implementation needed
-    return f"""[Web Search Placeholder]
-Query: {query}
+    try:
+        # Use DuckDuckGo HTML search (no API key required)
+        encoded_query = quote_plus(query)
+        url = f"https://html.duckduckgo.com/html/?q={encoded_query}"
 
-To implement this tool:
-1. Set up Google Custom Search API credentials
-2. Add GOOGLE_SEARCH_API_KEY and GOOGLE_SEARCH_ENGINE_ID to .env
-3. Replace this placeholder with actual search implementation
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+        }
 
-Example implementation:
-    import os
-    from googleapiclient.discovery import build
+        response = httpx.get(url, headers=headers, timeout=30.0, follow_redirects=True)
+        response.raise_for_status()
 
-    api_key = os.getenv("GOOGLE_SEARCH_API_KEY")
-    engine_id = os.getenv("GOOGLE_SEARCH_ENGINE_ID")
+        soup = BeautifulSoup(response.text, "html.parser")
 
-    service = build("customsearch", "v1", developerKey=api_key)
-    result = service.cse().list(q=query, cx=engine_id, num=5).execute()
-    return format_results(result.get("items", []))
-"""
+        results = []
+        # DuckDuckGo HTML results are in divs with class "result"
+        for i, result_div in enumerate(soup.select(".result"), 1):
+            if i > 5:  # Limit to 5 results
+                break
+
+            title_elem = result_div.select_one(".result__title a")
+            snippet_elem = result_div.select_one(".result__snippet")
+
+            if title_elem:
+                title = title_elem.get_text(strip=True)
+                href = title_elem.get("href", "")
+                snippet = snippet_elem.get_text(strip=True) if snippet_elem else "No description"
+
+                results.append(f"{i}. **{title}**\n   URL: {href}\n   {snippet}")
+
+        if results:
+            return f"Search results for '{query}':\n\n" + "\n\n".join(results)
+        else:
+            return f"No results found for '{query}'. Try a different search term."
+
+    except httpx.HTTPError as e:
+        return f"Search error: {e}. Please try again."
+    except Exception as e:
+        return f"Unexpected error during search: {e}"
 
 
 @tool

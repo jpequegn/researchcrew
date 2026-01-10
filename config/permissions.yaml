@@ -1,0 +1,67 @@
+# Tool Permissions Configuration
+# Defines which tools each agent is allowed to use
+
+agents:
+  orchestrator:
+    description: "Coordinates the research workflow"
+    allowed_tools:
+      - delegate_task
+      - get_status
+    notes: "Orchestrator only manages workflow, does not access external resources directly"
+
+  researcher:
+    description: "Finds information on specific topics"
+    allowed_tools:
+      - web_search
+      - read_url
+      - knowledge_search
+    constraints:
+      max_searches_per_task: 3
+      max_urls_per_task: 5
+    notes: "Primary tool user - accesses web and knowledge base"
+
+  synthesizer:
+    description: "Combines findings into coherent insights"
+    allowed_tools: []
+    notes: "LLM-only agent - processes input without external tools"
+
+  fact_checker:
+    description: "Validates claims against sources"
+    allowed_tools:
+      - web_search
+      - read_url
+    constraints:
+      max_searches_per_task: 2
+    notes: "Limited tool access for verification only"
+
+  writer:
+    description: "Produces the final research report"
+    allowed_tools: []
+    notes: "LLM-only agent - formats and writes without external access"
+
+# Tool definitions
+tools:
+  web_search:
+    description: "Search the web for information"
+    risk_level: low
+    rate_limit: "10 per minute"
+
+  read_url:
+    description: "Fetch and extract content from URLs"
+    risk_level: low
+    rate_limit: "20 per minute"
+
+  knowledge_search:
+    description: "Query the internal knowledge base"
+    risk_level: low
+    rate_limit: "50 per minute"
+
+  delegate_task:
+    description: "Assign tasks to sub-agents"
+    risk_level: medium
+    notes: "Only orchestrator can delegate"
+
+  get_status:
+    description: "Check status of delegated tasks"
+    risk_level: low
+    notes: "Only orchestrator needs status checks"
