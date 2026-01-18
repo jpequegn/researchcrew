@@ -19,6 +19,13 @@ from utils.session_manager import (
     get_session_manager,
     reset_session_manager,
 )
+from utils.knowledge_base import (
+    KnowledgeBaseManager,
+    KnowledgeEntry,
+    SearchResult,
+    get_knowledge_base,
+    reset_knowledge_base,
+)
 
 __all__ = [
     # Handoff utilities
@@ -35,4 +42,10 @@ __all__ = [
     "ConversationTurn",
     "get_session_manager",
     "reset_session_manager",
+    # Knowledge base
+    "KnowledgeBaseManager",
+    "KnowledgeEntry",
+    "SearchResult",
+    "get_knowledge_base",
+    "reset_knowledge_base",
 ]
