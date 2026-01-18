@@ -110,6 +110,13 @@ class WorkflowState(BaseModel):
     query: str = Field(description="Original query")
     status: str = Field(default="pending", description="Current workflow status")
 
+    # Session tracking for multi-turn conversations
+    session_id: Optional[str] = Field(default=None, description="Session identifier for multi-turn")
+    turn_number: int = Field(default=1, description="Current turn number in the session")
+    session_context: Optional[str] = Field(
+        default=None, description="Context from previous turns in this session"
+    )
+
     # Phase outputs (populated as workflow progresses)
     research: Optional[ResearchState] = Field(default=None)
     synthesis: Optional[SynthesisState] = Field(default=None)
@@ -119,3 +126,4 @@ class WorkflowState(BaseModel):
     # Metadata
     errors: list[str] = Field(default_factory=list, description="Errors encountered")
     duration_seconds: Optional[float] = Field(default=None, description="Total duration")
+    created_at: Optional[str] = Field(default=None, description="ISO timestamp when created")

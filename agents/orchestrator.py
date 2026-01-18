@@ -1,6 +1,7 @@
 """Orchestrator Agent
 
 Coordinates the research workflow and delegates tasks to specialized agents.
+Supports multi-turn conversations through session context injection.
 """
 
 from google.adk import Agent, SequentialAgent, ParallelAgent
@@ -31,7 +32,21 @@ Quality standards:
 - Confidence scores required for findings
 - Fact-checking pass required before final output
 
-Your goal is to produce accurate, comprehensive, well-sourced research reports.
+## Multi-Turn Conversation Support
+
+When the user's query includes context from previous research in this session:
+- Reference the previous findings when they are relevant
+- Build upon earlier research rather than starting from scratch
+- Acknowledge what was previously discovered
+- Focus new research on gaps or follow-up questions
+- If asked to "tell me more about X", expand on X from the session context
+
+If the query references something from earlier in the session (e.g., "the first topic",
+"what you mentioned about X", "tell me more"), use the session context provided
+to understand what they're referring to.
+
+Your goal is to produce accurate, comprehensive, well-sourced research reports
+that coherently build upon previous research when in a multi-turn conversation.
 """
 
 # Create parallel research phase with multiple researcher instances

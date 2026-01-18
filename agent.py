@@ -5,6 +5,11 @@ Run with: adk web
 
 The orchestrator coordinates the full research workflow:
   Research (parallel) → Synthesize → Fact-Check → Write
+
+For multi-turn conversations with session memory, use the ResearchCrewRunner:
+  from runner import ResearchCrewRunner
+  runner = ResearchCrewRunner()
+  result = runner.run("your query", session_id="optional-session-id")
 """
 
 import os
@@ -26,7 +31,7 @@ else:
 # ADK looks for 'root_agent' or 'agent' by convention
 agent = root_agent
 
-# Also export individual agents for direct access
+# Also export individual agents and session runner for direct access
 __all__ = [
     "agent",
     "root_agent",
