@@ -26,6 +26,19 @@ from utils.knowledge_base import (
     get_knowledge_base,
     reset_knowledge_base,
 )
+from utils.context_manager import (
+    ContextManager,
+    TokenCounter,
+    ContextCompressor,
+    ContextWindow,
+    ContextUsage,
+    ContextWarning,
+    CompressedContext,
+    ModelConfig,
+    MODEL_CONFIGS,
+    get_context_manager,
+    reset_context_manager,
+)
 
 __all__ = [
     # Handoff utilities
@@ -48,4 +61,16 @@ __all__ = [
     "SearchResult",
     "get_knowledge_base",
     "reset_knowledge_base",
+    # Context management
+    "ContextManager",
+    "TokenCounter",
+    "ContextCompressor",
+    "ContextWindow",
+    "ContextUsage",
+    "ContextWarning",
+    "CompressedContext",
+    "ModelConfig",
+    "MODEL_CONFIGS",
+    "get_context_manager",
+    "reset_context_manager",
 ]
