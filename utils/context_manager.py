@@ -73,6 +73,26 @@ MODEL_CONFIGS: dict[str, ModelConfig] = {
         max_context_tokens=200_000,
         max_output_tokens=4_096,
     ),
+    "claude-opus-4-5-20251101": ModelConfig(
+        name="claude-opus-4-5-20251101",
+        max_context_tokens=200_000,
+        max_output_tokens=32_000,
+    ),
+    "claude-opus-4.5": ModelConfig(
+        name="claude-opus-4.5",
+        max_context_tokens=200_000,
+        max_output_tokens=32_000,
+    ),
+    "claude-sonnet-4-20250514": ModelConfig(
+        name="claude-sonnet-4-20250514",
+        max_context_tokens=200_000,
+        max_output_tokens=16_000,
+    ),
+    "claude-4-sonnet": ModelConfig(
+        name="claude-4-sonnet",
+        max_context_tokens=200_000,
+        max_output_tokens=16_000,
+    ),
 }
 
 # Default configuration for unknown models
