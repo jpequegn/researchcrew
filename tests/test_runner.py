@@ -6,14 +6,16 @@ Tests the runner's session integration for multi-turn conversations.
 import pytest
 from runner import ResearchCrewRunner, run_research
 from utils.session_manager import reset_session_manager, get_session_manager
+from utils.context_manager import reset_context_manager
 
 
 class TestResearchCrewRunner:
     """Tests for the ResearchCrewRunner class."""
 
     def setup_method(self):
-        """Reset session manager before each test."""
+        """Reset session and context managers before each test."""
         reset_session_manager()
+        reset_context_manager()
         self.runner = ResearchCrewRunner()
 
     def test_create_session(self):
@@ -40,14 +42,15 @@ class TestResearchCrewRunner:
         assert result == query
 
     def test_build_prompt_with_empty_session(self):
-        """Test prompt building with new session returns original query."""
+        """Test prompt building with new session includes system prompt and query."""
         session_id = self.runner.create_session()
         query = "What are AI agents?"
 
         result = self.runner.build_prompt_with_context(query, session_id)
 
-        # New session has no history, should return original query
-        assert result == query
+        # New session has no history but includes formatting
+        assert query in result
+        assert "[Current Query]" in result
 
     def test_build_prompt_with_session_context(self):
         """Test prompt building includes session context."""
@@ -69,8 +72,8 @@ class TestResearchCrewRunner:
         query = "Tell me more about their capabilities"
         result = self.runner.build_prompt_with_context(query, session_id)
 
-        # Should include context
-        assert "Previous Research" in result
+        # Should include context sections
+        assert "[Session Context]" in result
         assert "What are LLMs?" in result
         assert "Tell me more about their capabilities" in result
         assert "LLMs can generate text" in result
@@ -180,8 +183,9 @@ class TestRunResearchFunction:
     """Tests for the run_research convenience function."""
 
     def setup_method(self):
-        """Reset session manager before each test."""
+        """Reset session and context managers before each test."""
         reset_session_manager()
+        reset_context_manager()
 
     def test_run_research_creates_session(self):
         """Test run_research creates a session."""
@@ -206,8 +210,9 @@ class TestMultiTurnConversation:
     """Integration tests for multi-turn conversation scenarios."""
 
     def setup_method(self):
-        """Reset session manager before each test."""
+        """Reset session and context managers before each test."""
         reset_session_manager()
+        reset_context_manager()
         self.runner = ResearchCrewRunner()
 
     def test_follow_up_question_has_context(self):
