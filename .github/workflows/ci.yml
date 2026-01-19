@@ -24,14 +24,16 @@ jobs:
       - name: Set up Python
         run: uv python install ${{ env.PYTHON_VERSION }}
 
-      - name: Install dependencies
-        run: uv pip install -e ".[dev]"
+      - name: Create venv and install dependencies
+        run: |
+          uv venv
+          uv pip install -e ".[dev]"
 
       - name: Run Ruff linter
-        run: ruff check .
+        run: uv run ruff check .
 
       - name: Run Ruff formatter check
-        run: ruff format --check .
+        run: uv run ruff format --check .
 
   typecheck:
     name: Type Check
@@ -47,11 +49,13 @@ jobs:
       - name: Set up Python
         run: uv python install ${{ env.PYTHON_VERSION }}
 
-      - name: Install dependencies
-        run: uv pip install -e ".[dev]"
+      - name: Create venv and install dependencies
+        run: |
+          uv venv
+          uv pip install -e ".[dev]"
 
       - name: Run mypy
-        run: mypy agents/ tools/ utils/ --ignore-missing-imports
+        run: uv run mypy agents/ tools/ utils/ --ignore-missing-imports
         continue-on-error: true  # Soft fail for now
 
   test:
@@ -68,12 +72,14 @@ jobs:
       - name: Set up Python
         run: uv python install ${{ env.PYTHON_VERSION }}
 
-      - name: Install dependencies
-        run: uv pip install -e ".[dev]"
+      - name: Create venv and install dependencies
+        run: |
+          uv venv
+          uv pip install -e ".[dev]"
 
       - name: Run tests with coverage
         run: |
-          pytest tests/ \
+          uv run pytest tests/ \
             --cov=agents \
             --cov=tools \
             --cov=utils \
@@ -104,12 +110,14 @@ jobs:
       - name: Set up Python
         run: uv python install ${{ env.PYTHON_VERSION }}
 
-      - name: Install dependencies
-        run: uv pip install -e ".[dev]"
+      - name: Create venv and install dependencies
+        run: |
+          uv venv
+          uv pip install -e ".[dev]"
 
       - name: Run evaluations
         run: |
-          python evals/run_evals.py --output eval_report.json
+          uv run python evals/run_evals.py --output eval_report.json
 
       - name: Check evaluation pass rate
         run: |
