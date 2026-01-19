@@ -1,0 +1,1027 @@
+{
+  "timestamp": "2026-01-19T05:20:59.231583",
+  "total_test_cases": 30,
+  "passed_count": 29,
+  "failed_count": 1,
+  "overall_pass_rate": 0.9666666666666667,
+  "average_scores": {
+    "Source Quality": 1.0,
+    "Completeness": 1.0,
+    "Coherence": 0.9299999999999999,
+    "Factual Accuracy": 0.9966666666666666
+  },
+  "scores_by_category": {
+    "research": {
+      "Source Quality": 1.0,
+      "Completeness": 1.0,
+      "Coherence": 0.9333333333333332,
+      "Factual Accuracy": 1.0,
+      "pass_rate": 1.0
+    },
+    "implementation": {
+      "Source Quality": 1.0,
+      "Completeness": 1.0,
+      "Coherence": 0.9333333333333332,
+      "Factual Accuracy": 1.0,
+      "pass_rate": 1.0
+    },
+    "comparison": {
+      "Source Quality": 1.0,
+      "Completeness": 1.0,
+      "Coherence": 0.9333333333333332,
+      "Factual Accuracy": 1.0,
+      "pass_rate": 1.0
+    },
+    "best-practices": {
+      "Source Quality": 1.0,
+      "Completeness": 1.0,
+      "Coherence": 0.9333333333333332,
+      "Factual Accuracy": 1.0,
+      "pass_rate": 1.0
+    },
+    "testing": {
+      "Source Quality": 1.0,
+      "Completeness": 1.0,
+      "Coherence": 0.9333333333333332,
+      "Factual Accuracy": 1.0,
+      "pass_rate": 1.0
+    },
+    "tooling": {
+      "Source Quality": 1.0,
+      "Completeness": 1.0,
+      "Coherence": 0.9333333333333332,
+      "Factual Accuracy": 1.0,
+      "pass_rate": 1.0
+    },
+    "architecture": {
+      "Source Quality": 1.0,
+      "Completeness": 1.0,
+      "Coherence": 0.9333333333333332,
+      "Factual Accuracy": 1.0,
+      "pass_rate": 1.0
+    },
+    "deployment": {
+      "Source Quality": 1.0,
+      "Completeness": 1.0,
+      "Coherence": 0.9333333333333332,
+      "Factual Accuracy": 1.0,
+      "pass_rate": 1.0
+    },
+    "resilience": {
+      "Source Quality": 1.0,
+      "Completeness": 1.0,
+      "Coherence": 0.9333333333333332,
+      "Factual Accuracy": 1.0,
+      "pass_rate": 1.0
+    },
+    "security": {
+      "Source Quality": 1.0,
+      "Completeness": 1.0,
+      "Coherence": 0.9333333333333332,
+      "Factual Accuracy": 1.0,
+      "pass_rate": 1.0
+    },
+    "concepts": {
+      "Source Quality": 1.0,
+      "Completeness": 1.0,
+      "Coherence": 0.9333333333333332,
+      "Factual Accuracy": 1.0,
+      "pass_rate": 1.0
+    },
+    "optimization": {
+      "Source Quality": 1.0,
+      "Completeness": 1.0,
+      "Coherence": 0.9333333333333332,
+      "Factual Accuracy": 1.0,
+      "pass_rate": 1.0
+    },
+    "synthesis": {
+      "Source Quality": 1.0,
+      "Completeness": 1.0,
+      "Coherence": 0.9333333333333332,
+      "Factual Accuracy": 1.0,
+      "pass_rate": 1.0
+    },
+    "fact-check": {
+      "Source Quality": 1.0,
+      "Completeness": 1.0,
+      "Coherence": 0.9333333333333332,
+      "Factual Accuracy": 1.0,
+      "pass_rate": 1.0
+    },
+    "adversarial": {
+      "Source Quality": 1.0,
+      "Completeness": 1.0,
+      "Coherence": 0.9083333333333332,
+      "Factual Accuracy": 0.975,
+      "pass_rate": 0.75
+    },
+    "observability": {
+      "Source Quality": 1.0,
+      "Completeness": 1.0,
+      "Coherence": 0.9333333333333332,
+      "Factual Accuracy": 1.0,
+      "pass_rate": 1.0
+    }
+  },
+  "scores_by_difficulty": {
+    "medium": {
+      "Source Quality": 1.0,
+      "Completeness": 1.0,
+      "Coherence": 0.9333333333333332,
+      "Factual Accuracy": 1.0,
+      "pass_rate": 1.0
+    },
+    "easy": {
+      "Source Quality": 1.0,
+      "Completeness": 1.0,
+      "Coherence": 0.9208333333333333,
+      "Factual Accuracy": 0.9875,
+      "pass_rate": 0.875
+    },
+    "hard": {
+      "Source Quality": 1.0,
+      "Completeness": 1.0,
+      "Coherence": 0.9333333333333332,
+      "Factual Accuracy": 1.0,
+      "pass_rate": 1.0
+    }
+  },
+  "scores_by_agent_type": {
+    "researcher": {
+      "Source Quality": 1.0,
+      "Completeness": 1.0,
+      "Coherence": 0.9285714285714284,
+      "Factual Accuracy": 0.9952380952380951,
+      "pass_rate": 0.9523809523809523
+    },
+    "synthesizer": {
+      "Source Quality": 1.0,
+      "Completeness": 1.0,
+      "Coherence": 0.9333333333333332,
+      "Factual Accuracy": 1.0,
+      "pass_rate": 1.0
+    },
+    "fact-checker": {
+      "Source Quality": 1.0,
+      "Completeness": 1.0,
+      "Coherence": 0.9333333333333332,
+      "Factual Accuracy": 1.0,
+      "pass_rate": 1.0
+    },
+    "writer": {
+      "Source Quality": 1.0,
+      "Completeness": 1.0,
+      "Coherence": 0.9333333333333332,
+      "Factual Accuracy": 1.0,
+      "pass_rate": 1.0
+    }
+  },
+  "test_case_results": [
+    {
+      "test_case_id": "tc-001",
+      "query": "What are the main AI agent frameworks in 2025?",
+      "category": "research",
+      "difficulty": "medium",
+      "agent_type": "researcher",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 4/4 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.9,
+        "source_quality": 0.8,
+        "completeness": 0.85,
+        "coherence": 0.9
+      },
+      "execution_time_ms": 0.43582916259765625
+    },
+    {
+      "test_case_id": "tc-002",
+      "query": "Explain circuit breaker patterns for agents",
+      "category": "research",
+      "difficulty": "medium",
+      "agent_type": "researcher",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 4/4 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.9,
+        "source_quality": 0.8,
+        "completeness": 0.8,
+        "coherence": 0.85
+      },
+      "execution_time_ms": 0.13589859008789062
+    },
+    {
+      "test_case_id": "tc-003",
+      "query": "What is the Model Context Protocol (MCP)?",
+      "category": "research",
+      "difficulty": "easy",
+      "agent_type": "researcher",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 3/3 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.95,
+        "source_quality": 0.9,
+        "completeness": 0.8,
+        "coherence": 0.9
+      },
+      "execution_time_ms": 0.10800361633300781
+    },
+    {
+      "test_case_id": "tc-004",
+      "query": "How do you implement retry with exponential backoff?",
+      "category": "implementation",
+      "difficulty": "easy",
+      "agent_type": "researcher",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 4/4 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.95,
+        "source_quality": 0.7,
+        "completeness": 0.85,
+        "coherence": 0.9
+      },
+      "execution_time_ms": 0.11014938354492188
+    },
+    {
+      "test_case_id": "tc-005",
+      "query": "Compare LangGraph vs Google ADK for multi-agent systems",
+      "category": "comparison",
+      "difficulty": "hard",
+      "agent_type": "synthesizer",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 4/4 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.85,
+        "source_quality": 0.85,
+        "completeness": 0.9,
+        "coherence": 0.85
+      },
+      "execution_time_ms": 0.10800361633300781
+    },
+    {
+      "test_case_id": "tc-006",
+      "query": "What are best practices for agent memory management?",
+      "category": "best-practices",
+      "difficulty": "medium",
+      "agent_type": "researcher",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 4/4 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.85,
+        "source_quality": 0.8,
+        "completeness": 0.85,
+        "coherence": 0.85
+      },
+      "execution_time_ms": 0.09608268737792969
+    },
+    {
+      "test_case_id": "tc-007",
+      "query": "How should agents be tested and evaluated?",
+      "category": "testing",
+      "difficulty": "medium",
+      "agent_type": "researcher",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 4/4 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.9,
+        "source_quality": 0.8,
+        "completeness": 0.85,
+        "coherence": 0.85
+      },
+      "execution_time_ms": 0.09083747863769531
+    },
+    {
+      "test_case_id": "tc-008",
+      "query": "What observability tools exist for AI agents?",
+      "category": "tooling",
+      "difficulty": "easy",
+      "agent_type": "researcher",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 4/4 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.9,
+        "source_quality": 0.85,
+        "completeness": 0.8,
+        "coherence": 0.9
+      },
+      "execution_time_ms": 0.08988380432128906
+    },
+    {
+      "test_case_id": "tc-009",
+      "query": "Explain the supervisor pattern in multi-agent systems",
+      "category": "architecture",
+      "difficulty": "medium",
+      "agent_type": "researcher",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 4/4 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.9,
+        "source_quality": 0.8,
+        "completeness": 0.85,
+        "coherence": 0.85
+      },
+      "execution_time_ms": 0.08988380432128906
+    },
+    {
+      "test_case_id": "tc-010",
+      "query": "How do you deploy agents to production?",
+      "category": "deployment",
+      "difficulty": "hard",
+      "agent_type": "researcher",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 4/4 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.85,
+        "source_quality": 0.8,
+        "completeness": 0.85,
+        "coherence": 0.8
+      },
+      "execution_time_ms": 0.09012222290039062
+    },
+    {
+      "test_case_id": "tc-011",
+      "query": "What is ReAct prompting and how does it work?",
+      "category": "research",
+      "difficulty": "easy",
+      "agent_type": "researcher",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 4/4 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.95,
+        "source_quality": 0.9,
+        "completeness": 0.85,
+        "coherence": 0.9
+      },
+      "execution_time_ms": 0.09083747863769531
+    },
+    {
+      "test_case_id": "tc-012",
+      "query": "Compare vector databases for agent RAG systems: Pinecone vs Chroma vs Weaviate",
+      "category": "comparison",
+      "difficulty": "hard",
+      "agent_type": "synthesizer",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 5/5 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.85,
+        "source_quality": 0.85,
+        "completeness": 0.9,
+        "coherence": 0.85
+      },
+      "execution_time_ms": 0.10323524475097656
+    },
+    {
+      "test_case_id": "tc-013",
+      "query": "How do agents handle tool failures gracefully?",
+      "category": "resilience",
+      "difficulty": "medium",
+      "agent_type": "researcher",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 4/4 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.9,
+        "source_quality": 0.8,
+        "completeness": 0.85,
+        "coherence": 0.85
+      },
+      "execution_time_ms": 0.09202957153320312
+    },
+    {
+      "test_case_id": "tc-014",
+      "query": "What security vulnerabilities affect AI agents?",
+      "category": "security",
+      "difficulty": "hard",
+      "agent_type": "researcher",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 4/4 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.9,
+        "source_quality": 0.9,
+        "completeness": 0.9,
+        "coherence": 0.85
+      },
+      "execution_time_ms": 0.09083747863769531
+    },
+    {
+      "test_case_id": "tc-015",
+      "query": "How do you implement function calling with OpenAI and Anthropic APIs?",
+      "category": "implementation",
+      "difficulty": "easy",
+      "agent_type": "researcher",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 4/4 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.95,
+        "source_quality": 0.9,
+        "completeness": 0.85,
+        "coherence": 0.9
+      },
+      "execution_time_ms": 0.09226799011230469
+    },
+    {
+      "test_case_id": "tc-016",
+      "query": "What are the trade-offs between single-agent and multi-agent architectures?",
+      "category": "architecture",
+      "difficulty": "hard",
+      "agent_type": "synthesizer",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 5/5 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.85,
+        "source_quality": 0.8,
+        "completeness": 0.9,
+        "coherence": 0.85
+      },
+      "execution_time_ms": 0.10895729064941406
+    },
+    {
+      "test_case_id": "tc-017",
+      "query": "How do you evaluate factual accuracy of agent responses?",
+      "category": "testing",
+      "difficulty": "medium",
+      "agent_type": "fact-checker",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 4/4 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.9,
+        "source_quality": 0.85,
+        "completeness": 0.85,
+        "coherence": 0.85
+      },
+      "execution_time_ms": 0.11205673217773438
+    },
+    {
+      "test_case_id": "tc-018",
+      "query": "What is the difference between agents and RAG pipelines?",
+      "category": "concepts",
+      "difficulty": "easy",
+      "agent_type": "researcher",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 5/5 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.95,
+        "source_quality": 0.85,
+        "completeness": 0.85,
+        "coherence": 0.9
+      },
+      "execution_time_ms": 0.11515617370605469
+    },
+    {
+      "test_case_id": "tc-019",
+      "query": "How do you implement streaming responses in agent systems?",
+      "category": "implementation",
+      "difficulty": "medium",
+      "agent_type": "researcher",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 4/4 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.9,
+        "source_quality": 0.8,
+        "completeness": 0.8,
+        "coherence": 0.85
+      },
+      "execution_time_ms": 0.1049041748046875
+    },
+    {
+      "test_case_id": "tc-020",
+      "query": "What cost optimization strategies exist for production agents?",
+      "category": "optimization",
+      "difficulty": "hard",
+      "agent_type": "researcher",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 5/5 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.85,
+        "source_quality": 0.8,
+        "completeness": 0.9,
+        "coherence": 0.85
+      },
+      "execution_time_ms": 0.11491775512695312
+    },
+    {
+      "test_case_id": "tc-021",
+      "query": "Synthesize a report on emerging trends in AI agent development for 2025",
+      "category": "synthesis",
+      "difficulty": "hard",
+      "agent_type": "writer",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 4/4 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.8,
+        "source_quality": 0.85,
+        "completeness": 0.9,
+        "coherence": 0.9
+      },
+      "execution_time_ms": 0.09298324584960938
+    },
+    {
+      "test_case_id": "tc-022",
+      "query": "Verify the claim: LangGraph is faster than CrewAI for simple workflows",
+      "category": "fact-check",
+      "difficulty": "hard",
+      "agent_type": "fact-checker",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 3/3 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.95,
+        "source_quality": 0.9,
+        "completeness": 0.8,
+        "coherence": 0.85
+      },
+      "execution_time_ms": 0.08606910705566406
+    },
+    {
+      "test_case_id": "tc-023",
+      "query": "Is AI going to replace all software developers?",
+      "category": "adversarial",
+      "difficulty": "hard",
+      "agent_type": "synthesizer",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 3/3 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.8,
+        "source_quality": 0.85,
+        "completeness": 0.85,
+        "coherence": 0.9
+      },
+      "execution_time_ms": 0.0820159912109375
+    },
+    {
+      "test_case_id": "tc-024",
+      "query": "What happened with AI agents yesterday?",
+      "category": "adversarial",
+      "difficulty": "easy",
+      "agent_type": "researcher",
+      "passed": false,
+      "overall_score": 0.9333333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.8333333333333334,
+        "Factual Accuracy": 0.9
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "No expected topics defined",
+        "Coherence": "Response is somewhat brief",
+        "Factual Accuracy": "Claims could use more hedging"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.7,
+        "source_quality": 0.5,
+        "completeness": 0.5,
+        "coherence": 0.9
+      },
+      "execution_time_ms": 0.05698204040527344
+    },
+    {
+      "test_case_id": "tc-025",
+      "query": "Tell me everything about agents",
+      "category": "adversarial",
+      "difficulty": "easy",
+      "agent_type": "researcher",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 3/3 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.85,
+        "source_quality": 0.75,
+        "completeness": 0.6,
+        "coherence": 0.85
+      },
+      "execution_time_ms": 0.08082389831542969
+    },
+    {
+      "test_case_id": "tc-026",
+      "query": "Which AI agent framework is the best?",
+      "category": "adversarial",
+      "difficulty": "medium",
+      "agent_type": "synthesizer",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 3/3 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.85,
+        "source_quality": 0.8,
+        "completeness": 0.8,
+        "coherence": 0.85
+      },
+      "execution_time_ms": 0.08082389831542969
+    },
+    {
+      "test_case_id": "tc-027",
+      "query": "How do you prevent prompt injection attacks in agents?",
+      "category": "security",
+      "difficulty": "hard",
+      "agent_type": "researcher",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 4/4 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.9,
+        "source_quality": 0.9,
+        "completeness": 0.9,
+        "coherence": 0.85
+      },
+      "execution_time_ms": 0.09202957153320312
+    },
+    {
+      "test_case_id": "tc-028",
+      "query": "What logging and debugging strategies work for multi-agent systems?",
+      "category": "observability",
+      "difficulty": "medium",
+      "agent_type": "researcher",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 4/4 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.9,
+        "source_quality": 0.8,
+        "completeness": 0.85,
+        "coherence": 0.85
+      },
+      "execution_time_ms": 0.09083747863769531
+    },
+    {
+      "test_case_id": "tc-029",
+      "query": "How do agents maintain state across conversation turns?",
+      "category": "architecture",
+      "difficulty": "medium",
+      "agent_type": "researcher",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 3/3 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.9,
+        "source_quality": 0.8,
+        "completeness": 0.85,
+        "coherence": 0.85
+      },
+      "execution_time_ms": 0.0820159912109375
+    },
+    {
+      "test_case_id": "tc-030",
+      "query": "Compare OpenAI Assistants API vs building custom agents",
+      "category": "comparison",
+      "difficulty": "hard",
+      "agent_type": "synthesizer",
+      "passed": true,
+      "overall_score": 0.9833333333333333,
+      "metric_scores": {
+        "Source Quality": 1.0,
+        "Completeness": 1.0,
+        "Coherence": 0.9333333333333332,
+        "Factual Accuracy": 1.0
+      },
+      "metric_reasons": {
+        "Source Quality": "Found 3 sources, 3 from authoritative domains",
+        "Completeness": "Covered 4/4 expected topics. Missing: none",
+        "Coherence": "Response shows good coherence",
+        "Factual Accuracy": "Response shows reasonable factual care"
+      },
+      "target_metrics": {
+        "factual_accuracy": 0.85,
+        "source_quality": 0.85,
+        "completeness": 0.9,
+        "coherence": 0.85
+      },
+      "execution_time_ms": 0.09012222290039062
+    }
+  ],
+  "filters_applied": {
+    "category": null,
+    "difficulty": null,
+    "agent_type": null
+  }
+}
