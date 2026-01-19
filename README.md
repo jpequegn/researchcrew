@@ -34,28 +34,36 @@ This is a hands-on learning project for mastering autonomous AI agents, covering
 
 ```
 researchcrew/
-├── agents/              # Agent definitions
-│   ├── orchestrator.py
-│   ├── researcher.py
-│   ├── synthesizer.py
-│   ├── fact_checker.py
-│   └── writer.py
+├── agents/              # Agent implementations
+│   ├── orchestrator.py  # Workflow coordinator
+│   ├── researcher.py    # Information gatherer
+│   ├── synthesizer.py   # Finding combiner
+│   ├── fact_checker.py  # Claim validator
+│   └── writer.py        # Report generator
 ├── tools/               # Tool implementations
-│   ├── search.py
-│   ├── web_fetch.py
-│   └── knowledge_base.py
-├── prompts/             # Versioned prompts
+│   ├── search.py        # Web search tool
+│   ├── web_fetch.py     # URL content extractor
+│   └── knowledge_base.py # Vector DB operations
+├── schemas/             # Pydantic data models
+├── utils/               # Shared utilities
+│   ├── resilience.py    # Retry & circuit breaker
+│   ├── tracing.py       # OpenTelemetry tracing
+│   └── metrics.py       # Prometheus metrics
+├── prompts/             # Versioned prompt templates
 │   └── v1/
-├── config/              # Environment configs
+├── config/              # Environment configurations
 │   ├── dev.yaml
 │   ├── staging.yaml
 │   └── prod.yaml
-├── evals/               # Evaluation datasets & scripts
+├── evals/               # Evaluation framework
 │   ├── golden_dataset.jsonl
+│   ├── metrics.py
 │   └── run_evals.py
 ├── mcp-servers/         # MCP tool servers
+│   ├── web-research-server/
+│   └── knowledge-base-server/
+├── tests/               # Test suite
 ├── docs/                # Documentation
-│   └── LEARNING_PROJECT.md
 ├── AGENTS.md            # Agent behavior specification
 ├── pyproject.toml       # Project dependencies
 └── README.md
@@ -106,6 +114,39 @@ adk run "Research the latest AI agent frameworks"
 | 8. Capstone | Full integration | Days 26-30 |
 
 See [docs/LEARNING_PROJECT.md](docs/LEARNING_PROJECT.md) for detailed instructions.
+
+## Documentation
+
+### Getting Started
+
+| Document | Description |
+|----------|-------------|
+| [Development Setup](docs/development/setup.md) | Local development environment setup |
+| [Testing Guide](docs/development/testing.md) | How to write and run tests |
+| [Contributing Guide](docs/development/contributing.md) | Contribution guidelines |
+
+### Architecture & Design
+
+| Document | Description |
+|----------|-------------|
+| [Architecture Overview](docs/architecture.md) | System architecture with diagrams |
+| [AGENTS.md](AGENTS.md) | Agent specifications and capabilities |
+| [API Reference](docs/api.md) | Python and HTTP API documentation |
+
+### Operations
+
+| Document | Description |
+|----------|-------------|
+| [Deployment Guide](docs/deployment.md) | Deploying to Vertex AI |
+| [Observability Guide](docs/infrastructure/observability.md) | Tracing, metrics, and logging |
+| [Debugging Runbook](docs/debugging-runbook.md) | Troubleshooting common issues |
+
+### Integrations
+
+| Document | Description |
+|----------|-------------|
+| [MCP Servers](docs/mcp-servers.md) | Model Context Protocol servers |
+| [Integrations](docs/integrations.md) | External framework integration |
 
 ## Resources
 
