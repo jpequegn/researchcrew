@@ -117,7 +117,20 @@ See [docs/LEARNING_PROJECT.md](docs/LEARNING_PROJECT.md) for detailed instructio
 
 ## Documentation
 
-### Getting Started
+### User Guide
+
+Start here if you want to use ResearchCrew for research:
+
+| Document | Description |
+|----------|-------------|
+| [User Guide](docs/user-guide/index.md) | Complete user documentation |
+| [Getting Started](docs/user-guide/getting-started.md) | Your first query in 5 minutes |
+| [Best Practices](docs/user-guide/best-practices.md) | Tips for better research |
+| [Troubleshooting](docs/user-guide/troubleshooting.md) | Common issues and solutions |
+
+### Developer Guide
+
+For developers extending or contributing to ResearchCrew:
 
 | Document | Description |
 |----------|-------------|
