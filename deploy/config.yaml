@@ -1,0 +1,129 @@
+# ResearchCrew Vertex AI Agent Engine Deployment Configuration
+#
+# This file contains the deployment settings for Vertex AI Agent Engine.
+# Customize values based on your GCP project and requirements.
+
+# Project Settings
+project:
+  id: "${GCP_PROJECT_ID}"
+  region: "us-central1"
+  service_account: "${GCP_SERVICE_ACCOUNT}"
+
+# Agent Configuration
+agent:
+  name: "researchcrew"
+  display_name: "ResearchCrew Multi-Agent Research Assistant"
+  description: "AI-powered multi-agent system for comprehensive web research and analysis"
+
+# Container Settings
+container:
+  image: "gcr.io/${GCP_PROJECT_ID}/researchcrew:latest"
+  port: 8080
+
+# Resource Allocation
+resources:
+  # Memory allocation (in MB)
+  # Recommended: Start with 1024MB, increase if needed
+  memory: 1024
+
+  # CPU allocation (in millicores)
+  # 1000m = 1 vCPU
+  cpu: 1000
+
+  # GPU configuration (optional)
+  # Uncomment if using GPU-accelerated models
+  # gpu:
+  #   type: "nvidia-tesla-t4"
+  #   count: 1
+
+# Scaling Configuration
+scaling:
+  # Minimum number of instances (0 = scale to zero)
+  min_instances: 0
+
+  # Maximum number of instances
+  max_instances: 5
+
+  # Concurrency per instance
+  max_concurrent_requests: 80
+
+  # Scaling triggers
+  target_cpu_utilization: 0.7
+  target_memory_utilization: 0.8
+
+# Timeout Settings
+timeouts:
+  # Request timeout (in seconds)
+  request: 300
+
+  # Startup timeout (in seconds)
+  startup: 120
+
+  # Idle timeout before scale-down (in seconds)
+  idle: 600
+
+# Health Checks
+health_check:
+  enabled: true
+  path: "/health"
+  interval: 30
+  timeout: 10
+  healthy_threshold: 2
+  unhealthy_threshold: 3
+
+# Environment Variables
+# Note: Sensitive values should use Secret Manager references
+environment:
+  # Application settings
+  LOG_LEVEL: "INFO"
+  PYTHONUNBUFFERED: "1"
+
+  # Model settings
+  DEFAULT_MODEL: "gemini-2.0-flash"
+  FALLBACK_MODEL: "gemini-1.5-flash"
+
+  # Feature flags
+  ENABLE_OBSERVABILITY: "true"
+  ENABLE_METRICS: "true"
+  ENABLE_TRACING: "true"
+
+# Secrets (reference Secret Manager secrets)
+# Format: "secret_name:version" or just "secret_name" for latest
+secrets:
+  GOOGLE_API_KEY: "researchcrew-google-api-key:latest"
+  # Add other secrets as needed
+  # SERPER_API_KEY: "researchcrew-serper-key:latest"
+
+# Network Configuration
+network:
+  # VPC connector for private networking (optional)
+  # vpc_connector: "projects/${GCP_PROJECT_ID}/locations/us-central1/connectors/my-connector"
+
+  # Egress settings
+  egress: "all"  # "all" or "private-ranges-only"
+
+  # Ingress settings
+  ingress: "all"  # "all", "internal", or "internal-and-cloud-load-balancing"
+
+# Logging and Monitoring
+observability:
+  # Cloud Logging
+  logging:
+    enabled: true
+    level: "INFO"
+
+  # Cloud Monitoring
+  monitoring:
+    enabled: true
+
+  # Cloud Trace
+  tracing:
+    enabled: true
+    sampling_rate: 0.1  # 10% of requests
+
+# Labels for resource organization
+labels:
+  app: "researchcrew"
+  environment: "production"
+  team: "ai-research"
+  managed-by: "adk"
