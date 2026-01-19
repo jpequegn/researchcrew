@@ -73,6 +73,16 @@ from utils.logging_config import (
     get_logger,
     LogContext,
 )
+from utils.debugging import (
+    FailureInjector,
+    FailureType,
+    FailureEvent,
+    DebugContext,
+    diagnose_failure,
+    get_debug_report,
+    inject_failure_decorator,
+    debug_span,
+)
 
 __all__ = [
     # Handoff utilities
@@ -138,4 +148,13 @@ __all__ = [
     "configure_logging",
     "get_logger",
     "LogContext",
+    # Debugging
+    "FailureInjector",
+    "FailureType",
+    "FailureEvent",
+    "DebugContext",
+    "diagnose_failure",
+    "get_debug_report",
+    "inject_failure_decorator",
+    "debug_span",
 ]
