@@ -1,0 +1,27 @@
+{
+  "name": "web-research-server",
+  "version": "1.0.0",
+  "description": "Web research tools for searching the web and reading URLs",
+  "repository": "https://github.com/jpequegn/researchcrew",
+  "tools": [
+    {
+      "name": "web_search",
+      "description": "Search the web for information on any topic"
+    },
+    {
+      "name": "read_url",
+      "description": "Fetch and extract content from a URL"
+    }
+  ],
+  "configuration": {
+    "SERPER_API_KEY": {
+      "type": "string",
+      "description": "API key for Serper search API",
+      "required": false
+    }
+  },
+  "dependencies": {
+    "httpx": ">=0.25.0",
+    "beautifulsoup4": ">=4.12.0"
+  }
+}
