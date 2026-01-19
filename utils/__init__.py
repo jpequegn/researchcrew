@@ -103,6 +103,22 @@ from utils.resilience import (
     get_retry_stats,
     clear_retry_stats,
 )
+from utils.circuit_breaker import (
+    CircuitBreaker,
+    CircuitState,
+    CircuitOpenError,
+    CircuitBreakerConfig,
+    CircuitBreakerPreset,
+    CircuitBreakerStats,
+    get_circuit_breaker,
+    reset_circuit_breaker,
+    reset_all_circuit_breakers,
+    clear_circuit_breakers,
+    get_all_circuit_stats,
+    circuit_breaker_call,
+    get_circuit_breaker_status,
+    is_service_healthy,
+)
 
 __all__ = [
     # Handoff utilities
@@ -196,4 +212,19 @@ __all__ = [
     "get_retry_wait",
     "get_retry_stats",
     "clear_retry_stats",
+    # Circuit Breaker
+    "CircuitBreaker",
+    "CircuitState",
+    "CircuitOpenError",
+    "CircuitBreakerConfig",
+    "CircuitBreakerPreset",
+    "CircuitBreakerStats",
+    "get_circuit_breaker",
+    "reset_circuit_breaker",
+    "reset_all_circuit_breakers",
+    "clear_circuit_breakers",
+    "get_all_circuit_stats",
+    "circuit_breaker_call",
+    "get_circuit_breaker_status",
+    "is_service_healthy",
 ]
