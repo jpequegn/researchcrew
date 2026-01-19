@@ -8,6 +8,10 @@ import tempfile
 from pathlib import Path
 
 import pytest
+
+# Skip this entire module if deepeval is not installed
+pytest.importorskip("deepeval", reason="deepeval not installed")
+
 from deepeval.test_case import LLMTestCase
 
 from evals.metrics import (
