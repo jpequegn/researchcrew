@@ -1,0 +1,32 @@
+{
+  "name": "knowledge-base-server",
+  "version": "1.0.0",
+  "description": "Knowledge base tools for storing and retrieving research findings",
+  "repository": "https://github.com/jpequegn/researchcrew",
+  "tools": [
+    {
+      "name": "knowledge_search",
+      "description": "Search the knowledge base for relevant information on a topic"
+    },
+    {
+      "name": "save_to_knowledge",
+      "description": "Save new information to the knowledge base"
+    },
+    {
+      "name": "list_topics",
+      "description": "List all topics in the knowledge base"
+    },
+    {
+      "name": "get_entry",
+      "description": "Get a specific entry by ID"
+    }
+  ],
+  "configuration": {
+    "KNOWLEDGE_BASE_PATH": {
+      "type": "string",
+      "description": "Path to knowledge base storage directory",
+      "required": false,
+      "default": "./knowledge_base"
+    }
+  }
+}
