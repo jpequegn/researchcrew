@@ -19,6 +19,12 @@ from utils.context_manager import (
     ContextWarning,
     get_context_manager,
 )
+from utils.tracing import (
+    get_tracer,
+    trace_span,
+    add_trace_context,
+    get_trace_id,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -314,59 +320,91 @@ If the current query references previous findings (e.g., "tell me more about X",
         Returns:
             Dictionary containing the research result and session info
         """
-        # Get or create session
-        if session_id:
-            session = self.session_manager.get_or_create_session(
-                session_id=session_id, user_id=user_id
+        with trace_span(
+            "research_workflow",
+            attributes={
+                "workflow.type": "research",
+                "workflow.query_preview": query[:200],
+                "workflow.session_id": session_id,
+                "workflow.user_id": user_id,
+            },
+        ) as workflow_span:
+            # Get or create session
+            with trace_span("session.resolve") as session_span:
+                if session_id:
+                    session = self.session_manager.get_or_create_session(
+                        session_id=session_id, user_id=user_id
+                    )
+                    session_span.set_attribute("session.action", "retrieved")
+                else:
+                    session = self.session_manager.create_session(user_id=user_id)
+                    session_span.set_attribute("session.action", "created")
+
+                session_id = session.session_id
+                turn_number = len(session.conversation_history) + 1
+                session_span.set_attribute("session.id", session_id)
+                session_span.set_attribute("session.turn_number", turn_number)
+
+            # Add research context to the workflow span
+            add_trace_context(
+                query=query,
+                session_id=session_id,
+                user_id=user_id,
+                turn_number=turn_number,
             )
-        else:
-            session = self.session_manager.create_session(user_id=user_id)
 
-        session_id = session.session_id
-        turn_number = len(session.conversation_history) + 1
+            workflow_span.set_attribute("workflow.session_id", session_id)
+            workflow_span.set_attribute("workflow.turn_number", turn_number)
 
-        logger.info(f"Running query in session {session_id}, turn {turn_number}")
+            logger.info(f"Running query in session {session_id}, turn {turn_number}")
 
-        # Build prompt with context from previous turns (with token management)
-        augmented_query = self.build_prompt_with_context(
-            query, session_id, auto_compress=auto_compress
-        )
+            # Build prompt with context from previous turns (with token management)
+            with trace_span("context.build") as context_span:
+                augmented_query = self.build_prompt_with_context(
+                    query, session_id, auto_compress=auto_compress
+                )
+                context_span.set_attribute("context.augmented", augmented_query != query)
 
-        # Get context info for result
-        context_info = None
-        if self._last_context_usage:
-            usage = self._last_context_usage
-            context_info = {
-                "total_tokens": usage.total_tokens,
-                "history_tokens": usage.history_tokens,
-                "facts_tokens": usage.facts_tokens,
-                "query_tokens": usage.query_tokens,
-                "warnings": [
-                    {"level": w.level, "message": w.message}
-                    for w in self._last_context_warnings
-                ],
+            # Get context info for result
+            context_info = None
+            if self._last_context_usage:
+                usage = self._last_context_usage
+                context_info = {
+                    "total_tokens": usage.total_tokens,
+                    "history_tokens": usage.history_tokens,
+                    "facts_tokens": usage.facts_tokens,
+                    "query_tokens": usage.query_tokens,
+                    "warnings": [
+                        {"level": w.level, "message": w.message}
+                        for w in self._last_context_warnings
+                    ],
+                }
+                workflow_span.set_attribute("context.total_tokens", usage.total_tokens)
+
+            # Here we would invoke the actual ADK agent
+            # For now, return a placeholder structure
+            # In production, this would be:
+            #   from agents.orchestrator import orchestrator_agent
+            #   with trace_span("agent.orchestrator") as agent_span:
+            #       result = await orchestrator_agent.run(augmented_query)
+
+            trace_id = get_trace_id()
+            result = {
+                "session_id": session_id,
+                "turn_number": turn_number,
+                "query": query,
+                "augmented_query": augmented_query if augmented_query != query else None,
+                "context": context_info,
+                "trace_id": trace_id,
+                "status": "pending_implementation",
+                "message": (
+                    "Session and context management ready. "
+                    "Agent execution integration pending ADK runner setup."
+                ),
             }
 
-        # Here we would invoke the actual ADK agent
-        # For now, return a placeholder structure
-        # In production, this would be:
-        #   from agents.orchestrator import orchestrator_agent
-        #   result = await orchestrator_agent.run(augmented_query)
-
-        result = {
-            "session_id": session_id,
-            "turn_number": turn_number,
-            "query": query,
-            "augmented_query": augmented_query if augmented_query != query else None,
-            "context": context_info,
-            "status": "pending_implementation",
-            "message": (
-                "Session and context management ready. "
-                "Agent execution integration pending ADK runner setup."
-            ),
-        }
-
-        return result
+            workflow_span.set_attribute("workflow.status", "complete")
+            return result
 
     def run(
         self,

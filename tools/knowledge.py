@@ -8,6 +8,7 @@ import logging
 from typing import Optional
 
 from utils.knowledge_base import get_knowledge_base, SearchResult
+from utils.tracing import trace_span, get_trace_id
 
 logger = logging.getLogger(__name__)
 
@@ -39,45 +40,58 @@ def knowledge_search(
            Topic: AI frameworks
         ..."
     """
-    try:
-        kb = get_knowledge_base()
-        results = kb.search(
-            query=query,
-            n_results=max_results,
-            topic_filter=topic,
-        )
-
-        if not results:
-            return (
-                f"No relevant past research found for: '{query}'. "
-                "This appears to be a new topic that hasn't been researched before."
+    with trace_span(
+        "tool.knowledge_search",
+        attributes={
+            "tool.name": "knowledge_search",
+            "tool.query": query[:500],
+            "tool.max_results": max_results,
+            "tool.topic_filter": topic,
+            "trace.id": get_trace_id(),
+        },
+    ) as span:
+        try:
+            kb = get_knowledge_base()
+            results = kb.search(
+                query=query,
+                n_results=max_results,
+                topic_filter=topic,
             )
 
-        # Format results for the agent
-        output_lines = [f"Found {len(results)} relevant entries from past research:\n"]
+            span.set_attribute("tool.result_count", len(results))
 
-        for i, result in enumerate(results, 1):
-            entry = result.entry
-            score_pct = int(result.score * 100)
+            if not results:
+                return (
+                    f"No relevant past research found for: '{query}'. "
+                    "This appears to be a new topic that hasn't been researched before."
+                )
 
-            output_lines.append(f"{i}. [Relevance: {score_pct}%] {entry.content[:500]}")
+            # Format results for the agent
+            output_lines = [f"Found {len(results)} relevant entries from past research:\n"]
 
-            if entry.source_url:
-                output_lines.append(f"   Source: {entry.source_url}")
-            if entry.source_title:
-                output_lines.append(f"   Title: {entry.source_title}")
-            if entry.topic:
-                output_lines.append(f"   Topic: {entry.topic}")
-            if entry.confidence:
-                output_lines.append(f"   Confidence: {entry.confidence}")
+            for i, result in enumerate(results, 1):
+                entry = result.entry
+                score_pct = int(result.score * 100)
 
-            output_lines.append("")  # Empty line between entries
+                output_lines.append(f"{i}. [Relevance: {score_pct}%] {entry.content[:500]}")
 
-        return "\n".join(output_lines)
+                if entry.source_url:
+                    output_lines.append(f"   Source: {entry.source_url}")
+                if entry.source_title:
+                    output_lines.append(f"   Title: {entry.source_title}")
+                if entry.topic:
+                    output_lines.append(f"   Topic: {entry.topic}")
+                if entry.confidence:
+                    output_lines.append(f"   Confidence: {entry.confidence}")
 
-    except Exception as e:
-        logger.error(f"Error searching knowledge base: {e}")
-        return f"Error searching knowledge base: {str(e)}"
+                output_lines.append("")  # Empty line between entries
+
+            return "\n".join(output_lines)
+
+        except Exception as e:
+            span.set_attribute("tool.error", str(e))
+            logger.error(f"Error searching knowledge base: {e}")
+            return f"Error searching knowledge base: {str(e)}"
 
 
 def save_to_knowledge(
@@ -113,46 +127,64 @@ def save_to_knowledge(
         ... )
         "Successfully saved to knowledge base with ID: abc123..."
     """
-    # Validate confidence level
-    valid_confidence = ["high", "medium", "low"]
-    if confidence not in valid_confidence:
-        confidence = "medium"
+    with trace_span(
+        "tool.save_to_knowledge",
+        attributes={
+            "tool.name": "save_to_knowledge",
+            "tool.content_length": len(content),
+            "tool.topic": topic,
+            "tool.confidence": confidence,
+            "tool.has_source_url": source_url is not None,
+            "trace.id": get_trace_id(),
+        },
+    ) as span:
+        # Validate confidence level
+        valid_confidence = ["high", "medium", "low"]
+        if confidence not in valid_confidence:
+            confidence = "medium"
 
-    # Validate content length
-    if len(content) < 10:
-        return "Error: Content too short. Please provide a meaningful finding (at least 10 characters)."
+        # Validate content length
+        if len(content) < 10:
+            span.set_attribute("tool.error", "content_too_short")
+            return "Error: Content too short. Please provide a meaningful finding (at least 10 characters)."
 
-    if len(content) > 5000:
-        return "Error: Content too long. Please break into smaller, focused findings (max 5000 characters)."
+        if len(content) > 5000:
+            span.set_attribute("tool.error", "content_too_long")
+            return "Error: Content too long. Please break into smaller, focused findings (max 5000 characters)."
 
-    try:
-        kb = get_knowledge_base()
-        entry = kb.add_entry(
-            content=content,
-            source_url=source_url,
-            source_title=source_title,
-            topic=topic,
-            confidence=confidence,
-            skip_duplicates=True,
-        )
-
-        if entry:
-            return (
-                f"Successfully saved to knowledge base.\n"
-                f"  ID: {entry.id}\n"
-                f"  Topic: {topic or 'uncategorized'}\n"
-                f"  Confidence: {confidence}\n"
-                f"  Source: {source_url or 'none provided'}"
+        try:
+            kb = get_knowledge_base()
+            entry = kb.add_entry(
+                content=content,
+                source_url=source_url,
+                source_title=source_title,
+                topic=topic,
+                confidence=confidence,
+                skip_duplicates=True,
             )
-        else:
-            return (
-                "Content was not saved - similar information already exists in the knowledge base. "
-                "This prevents duplicate entries."
-            )
 
-    except Exception as e:
-        logger.error(f"Error saving to knowledge base: {e}")
-        return f"Error saving to knowledge base: {str(e)}"
+            if entry:
+                span.set_attribute("tool.entry_id", entry.id)
+                span.set_attribute("tool.saved", True)
+                return (
+                    f"Successfully saved to knowledge base.\n"
+                    f"  ID: {entry.id}\n"
+                    f"  Topic: {topic or 'uncategorized'}\n"
+                    f"  Confidence: {confidence}\n"
+                    f"  Source: {source_url or 'none provided'}"
+                )
+            else:
+                span.set_attribute("tool.saved", False)
+                span.set_attribute("tool.reason", "duplicate")
+                return (
+                    "Content was not saved - similar information already exists in the knowledge base. "
+                    "This prevents duplicate entries."
+                )
+
+        except Exception as e:
+            span.set_attribute("tool.error", str(e))
+            logger.error(f"Error saving to knowledge base: {e}")
+            return f"Error saving to knowledge base: {str(e)}"
 
 
 def list_knowledge_topics() -> str:

@@ -39,6 +39,18 @@ from utils.context_manager import (
     get_context_manager,
     reset_context_manager,
 )
+from utils.tracing import (
+    init_tracing,
+    get_tracer,
+    reset_tracing,
+    trace_span,
+    trace_tool,
+    trace_agent,
+    trace_llm_call,
+    add_trace_context,
+    get_trace_id,
+    get_span_id,
+)
 
 __all__ = [
     # Handoff utilities
@@ -73,4 +85,15 @@ __all__ = [
     "MODEL_CONFIGS",
     "get_context_manager",
     "reset_context_manager",
+    # Tracing
+    "init_tracing",
+    "get_tracer",
+    "reset_tracing",
+    "trace_span",
+    "trace_tool",
+    "trace_agent",
+    "trace_llm_call",
+    "add_trace_context",
+    "get_trace_id",
+    "get_span_id",
 ]
