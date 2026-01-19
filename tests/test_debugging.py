@@ -4,8 +4,9 @@ Tests the debugging module for ResearchCrew.
 """
 
 import time
+from datetime import datetime
+
 import pytest
-from datetime import datetime, timedelta
 
 
 class TestFailureInjector:
@@ -60,8 +61,8 @@ class TestFailureInjector:
 
     def test_record_failure(self):
         """Test failure event recording."""
+        from utils import init_metrics, reset_metrics
         from utils.debugging import FailureInjector, FailureType
-        from utils import reset_metrics, init_metrics
 
         reset_metrics()
         init_metrics()
@@ -85,22 +86,16 @@ class TestFailureInjector:
 
     def test_failure_history_filtering(self):
         """Test filtering failure history."""
+        from utils import init_metrics, reset_metrics
         from utils.debugging import FailureInjector, FailureType
-        from utils import reset_metrics, init_metrics
 
         reset_metrics()
         init_metrics()
 
         # Record multiple failures
-        FailureInjector.record_failure(
-            FailureType.TOOL_ERROR, "component_a", "Error A"
-        )
-        FailureInjector.record_failure(
-            FailureType.TIMEOUT, "component_b", "Error B"
-        )
-        FailureInjector.record_failure(
-            FailureType.TOOL_ERROR, "component_b", "Error C"
-        )
+        FailureInjector.record_failure(FailureType.TOOL_ERROR, "component_a", "Error A")
+        FailureInjector.record_failure(FailureType.TIMEOUT, "component_b", "Error B")
+        FailureInjector.record_failure(FailureType.TOOL_ERROR, "component_b", "Error C")
 
         # Filter by component
         history_a = FailureInjector.get_failure_history(component="component_a")
@@ -181,8 +176,8 @@ class TestDiagnoseFailure:
 
     def setup_method(self):
         """Reset state before each test."""
+        from utils import init_metrics, reset_metrics
         from utils.debugging import FailureInjector
-        from utils import reset_metrics, init_metrics
 
         FailureInjector.reset()
         reset_metrics()
@@ -190,8 +185,8 @@ class TestDiagnoseFailure:
 
     def teardown_method(self):
         """Reset state after each test."""
-        from utils.debugging import FailureInjector
         from utils import reset_metrics
+        from utils.debugging import FailureInjector
 
         FailureInjector.reset()
         reset_metrics()
@@ -207,15 +202,11 @@ class TestDiagnoseFailure:
 
     def test_diagnose_with_failures(self):
         """Test diagnosis when failures are present."""
-        from utils.debugging import diagnose_failure, FailureInjector, FailureType
+        from utils.debugging import FailureInjector, FailureType, diagnose_failure
 
         # Record some failures
-        FailureInjector.record_failure(
-            FailureType.TOOL_ERROR, "test", "Error 1"
-        )
-        FailureInjector.record_failure(
-            FailureType.TOOL_ERROR, "test", "Error 2"
-        )
+        FailureInjector.record_failure(FailureType.TOOL_ERROR, "test", "Error 1")
+        FailureInjector.record_failure(FailureType.TOOL_ERROR, "test", "Error 2")
 
         report = diagnose_failure(component="test", time_range_minutes=5)
 
@@ -224,12 +215,10 @@ class TestDiagnoseFailure:
 
     def test_diagnose_recommendations(self):
         """Test that appropriate recommendations are generated."""
-        from utils.debugging import diagnose_failure, FailureInjector, FailureType
+        from utils.debugging import FailureInjector, FailureType, diagnose_failure
 
         # Record tool errors
-        FailureInjector.record_failure(
-            FailureType.TOOL_ERROR, "test", "Error"
-        )
+        FailureInjector.record_failure(FailureType.TOOL_ERROR, "test", "Error")
 
         report = diagnose_failure(component="test", time_range_minutes=5)
 
@@ -242,8 +231,8 @@ class TestGetDebugReport:
 
     def setup_method(self):
         """Reset state before each test."""
+        from utils import init_metrics, reset_metrics
         from utils.debugging import FailureInjector
-        from utils import reset_metrics, init_metrics
 
         FailureInjector.reset()
         reset_metrics()
@@ -251,8 +240,8 @@ class TestGetDebugReport:
 
     def teardown_method(self):
         """Reset state after each test."""
-        from utils.debugging import FailureInjector
         from utils import reset_metrics
+        from utils.debugging import FailureInjector
 
         FailureInjector.reset()
         reset_metrics()
@@ -270,11 +259,9 @@ class TestGetDebugReport:
 
     def test_report_with_failures(self):
         """Test report includes failure history."""
-        from utils.debugging import get_debug_report, FailureInjector, FailureType
+        from utils.debugging import FailureInjector, FailureType, get_debug_report
 
-        FailureInjector.record_failure(
-            FailureType.TOOL_ERROR, "test", "Test error"
-        )
+        FailureInjector.record_failure(FailureType.TOOL_ERROR, "test", "Test error")
 
         report = get_debug_report(include_failure_history=True)
 
@@ -283,7 +270,7 @@ class TestGetDebugReport:
 
     def test_report_with_active_injections(self):
         """Test report shows active injections."""
-        from utils.debugging import get_debug_report, FailureInjector
+        from utils.debugging import FailureInjector, get_debug_report
 
         with FailureInjector.tool_failure("test_tool"):
             report = get_debug_report()
@@ -295,8 +282,8 @@ class TestInjectFailureDecorator:
 
     def setup_method(self):
         """Reset state before each test."""
+        from utils import init_metrics, reset_metrics
         from utils.debugging import FailureInjector
-        from utils import reset_metrics, init_metrics
 
         FailureInjector.reset()
         reset_metrics()
@@ -304,15 +291,15 @@ class TestInjectFailureDecorator:
 
     def teardown_method(self):
         """Reset state after each test."""
-        from utils.debugging import FailureInjector
         from utils import reset_metrics
+        from utils.debugging import FailureInjector
 
         FailureInjector.reset()
         reset_metrics()
 
     def test_decorator_success(self):
         """Test decorated function succeeds when no failure injected."""
-        from utils.debugging import inject_failure_decorator, FailureType
+        from utils.debugging import FailureType, inject_failure_decorator
 
         @inject_failure_decorator(FailureType.TOOL_ERROR, error_rate=0.0)
         def my_function(x: int) -> int:
@@ -323,7 +310,7 @@ class TestInjectFailureDecorator:
 
     def test_decorator_failure(self):
         """Test decorated function fails when failure injected."""
-        from utils.debugging import inject_failure_decorator, FailureType
+        from utils.debugging import FailureType, inject_failure_decorator
 
         @inject_failure_decorator(FailureType.TOOL_ERROR, error_rate=1.0)
         def my_function(x: int) -> int:
@@ -340,8 +327,8 @@ class TestDebugSpan:
 
     def setup_method(self):
         """Reset state before each test."""
+        from utils import init_metrics, init_tracing, reset_metrics, reset_tracing
         from utils.debugging import FailureInjector
-        from utils import reset_tracing, init_tracing, reset_metrics, init_metrics
 
         FailureInjector.reset()
         reset_tracing()
@@ -351,8 +338,8 @@ class TestDebugSpan:
 
     def teardown_method(self):
         """Reset state after each test."""
+        from utils import reset_metrics, reset_tracing
         from utils.debugging import FailureInjector
-        from utils import reset_tracing, reset_metrics
 
         FailureInjector.reset()
         reset_tracing()
@@ -386,7 +373,7 @@ class TestDebugSpan:
 
     def test_debug_span_records_failure(self):
         """Test that debug span records failure in history."""
-        from utils.debugging import debug_span, FailureInjector
+        from utils.debugging import FailureInjector, debug_span
 
         try:
             with debug_span("test_op", record_errors=True):
@@ -432,13 +419,13 @@ class TestIntegrationWithObservability:
 
     def setup_method(self):
         """Reset all observability tools."""
-        from utils.debugging import FailureInjector
         from utils import (
-            reset_tracing,
+            init_metrics,
             init_tracing,
             reset_metrics,
-            init_metrics,
+            reset_tracing,
         )
+        from utils.debugging import FailureInjector
 
         FailureInjector.reset()
         reset_tracing()
@@ -448,8 +435,8 @@ class TestIntegrationWithObservability:
 
     def teardown_method(self):
         """Reset all observability tools."""
+        from utils import reset_metrics, reset_tracing
         from utils.debugging import FailureInjector
-        from utils import reset_tracing, reset_metrics
 
         FailureInjector.reset()
         reset_tracing()
@@ -457,20 +444,18 @@ class TestIntegrationWithObservability:
 
     def test_failure_records_to_metrics(self):
         """Test that failures are recorded in metrics."""
-        from utils.debugging import FailureInjector, FailureType
         from utils import get_metrics_text
+        from utils.debugging import FailureInjector, FailureType
 
-        FailureInjector.record_failure(
-            FailureType.TOOL_ERROR, "test_agent", "Test error"
-        )
+        FailureInjector.record_failure(FailureType.TOOL_ERROR, "test_agent", "Test error")
 
         metrics = get_metrics_text()
         assert "agent_error_total" in metrics
 
     def test_debug_span_creates_trace(self):
         """Test that debug_span creates trace spans."""
-        from utils.debugging import debug_span
         from utils import get_trace_id
+        from utils.debugging import debug_span
 
         with debug_span("test_operation") as ctx:
             trace_id = get_trace_id()
@@ -480,9 +465,9 @@ class TestIntegrationWithObservability:
     def test_full_debugging_workflow(self):
         """Test complete debugging workflow."""
         from utils.debugging import (
-            debug_span,
             FailureInjector,
             FailureType,
+            debug_span,
             diagnose_failure,
             get_debug_report,
         )

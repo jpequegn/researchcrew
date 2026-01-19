@@ -20,22 +20,21 @@ Usage:
     print(debug.summary())
 """
 
-import logging
-import time
 import random
+import time
+from collections.abc import Callable, Generator
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Callable, Generator, Optional, TypeVar
+from typing import Any, TypeVar
 
-from utils.tracing import get_trace_id, get_span_id, trace_span
-from utils.metrics import (
-    record_error,
-    record_tool_call,
-    get_metrics_text,
-)
 from utils.logging_config import get_logger
+from utils.metrics import (
+    get_metrics_text,
+    record_error,
+)
+from utils.tracing import get_span_id, get_trace_id, trace_span
 
 logger = get_logger(__name__)
 
@@ -62,8 +61,8 @@ class FailureEvent:
     failure_type: FailureType
     component: str
     error_message: str
-    trace_id: Optional[str] = None
-    span_id: Optional[str] = None
+    trace_id: str | None = None
+    span_id: str | None = None
     context: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -200,7 +199,7 @@ class FailureInjector:
         return random.random() < probability
 
     @classmethod
-    def get_injection(cls, injection_id: str) -> Optional[dict[str, Any]]:
+    def get_injection(cls, injection_id: str) -> dict[str, Any] | None:
         """Get injection configuration if active."""
         return cls._active_injections.get(injection_id)
 
@@ -210,7 +209,7 @@ class FailureInjector:
         failure_type: FailureType,
         component: str,
         error_message: str,
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> FailureEvent:
         """Record a failure event.
 
@@ -224,7 +223,7 @@ class FailureInjector:
             The recorded FailureEvent.
         """
         event = FailureEvent(
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             failure_type=failure_type,
             component=component,
             error_message=error_message,
@@ -257,9 +256,9 @@ class FailureInjector:
     @classmethod
     def get_failure_history(
         cls,
-        component: Optional[str] = None,
-        failure_type: Optional[FailureType] = None,
-        since: Optional[datetime] = None,
+        component: str | None = None,
+        failure_type: FailureType | None = None,
+        since: datetime | None = None,
     ) -> list[FailureEvent]:
         """Get failure history with optional filters.
 
@@ -291,7 +290,7 @@ class DebugContext:
 
     trace_id: str
     start_time: datetime
-    end_time: Optional[datetime] = None
+    end_time: datetime | None = None
     spans: list[dict[str, Any]] = field(default_factory=list)
     errors: list[dict[str, Any]] = field(default_factory=list)
     metrics: dict[str, Any] = field(default_factory=dict)
@@ -305,7 +304,7 @@ class DebugContext:
         """
         return cls(
             trace_id=trace_id,
-            start_time=datetime.now(timezone.utc),
+            start_time=datetime.now(UTC),
         )
 
     def add_span(self, span_data: dict[str, Any]) -> None:
@@ -326,7 +325,7 @@ class DebugContext:
             f"=== Debug Context for Trace: {self.trace_id} ===",
             f"Start Time: {self.start_time.isoformat()}",
             f"End Time: {self.end_time.isoformat() if self.end_time else 'In Progress'}",
-            f"",
+            "",
             f"Spans: {len(self.spans)}",
             f"Errors: {len(self.errors)}",
             f"Log Entries: {len(self.logs)}",
@@ -342,8 +341,8 @@ class DebugContext:
 
 
 def diagnose_failure(
-    trace_id: Optional[str] = None,
-    component: Optional[str] = None,
+    trace_id: str | None = None,
+    component: str | None = None,
     time_range_minutes: int = 5,
 ) -> dict[str, Any]:
     """Diagnose a failure using available observability data.
@@ -357,7 +356,7 @@ def diagnose_failure(
         Diagnostic report with findings.
     """
     report: dict[str, Any] = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "trace_id": trace_id,
         "component": component,
         "findings": [],
@@ -365,10 +364,8 @@ def diagnose_failure(
     }
 
     # Check failure history
-    since = datetime.now(timezone.utc)
-    since = since.replace(
-        minute=since.minute - time_range_minutes if since.minute >= time_range_minutes else 0
-    )
+    since = datetime.now(UTC)
+    since = since.replace(minute=since.minute - time_range_minutes if since.minute >= time_range_minutes else 0)
 
     failures = FailureInjector.get_failure_history(
         component=component,
@@ -376,11 +373,13 @@ def diagnose_failure(
     )
 
     if failures:
-        report["findings"].append({
-            "type": "recent_failures",
-            "count": len(failures),
-            "failures": [f.to_dict() for f in failures[-5:]],  # Last 5
-        })
+        report["findings"].append(
+            {
+                "type": "recent_failures",
+                "count": len(failures),
+                "failures": [f.to_dict() for f in failures[-5:]],  # Last 5
+            }
+        )
 
         # Analyze failure patterns
         failure_types = {}
@@ -389,35 +388,31 @@ def diagnose_failure(
             failure_types[ft] = failure_types.get(ft, 0) + 1
 
         most_common = max(failure_types.items(), key=lambda x: x[1])
-        report["findings"].append({
-            "type": "failure_pattern",
-            "most_common_failure": most_common[0],
-            "occurrence_count": most_common[1],
-        })
+        report["findings"].append(
+            {
+                "type": "failure_pattern",
+                "most_common_failure": most_common[0],
+                "occurrence_count": most_common[1],
+            }
+        )
 
         # Add recommendations based on failure type
         if most_common[0] == FailureType.TOOL_ERROR.value:
-            report["recommendations"].append(
-                "Check tool implementation and external service availability"
-            )
+            report["recommendations"].append("Check tool implementation and external service availability")
         elif most_common[0] == FailureType.TIMEOUT.value:
-            report["recommendations"].append(
-                "Consider increasing timeout values or adding retry logic"
-            )
+            report["recommendations"].append("Consider increasing timeout values or adding retry logic")
         elif most_common[0] == FailureType.TOKEN_LIMIT.value:
-            report["recommendations"].append(
-                "Implement context compression or reduce prompt size"
-            )
+            report["recommendations"].append("Implement context compression or reduce prompt size")
         elif most_common[0] == FailureType.RATE_LIMIT.value:
-            report["recommendations"].append(
-                "Add rate limiting with exponential backoff"
-            )
+            report["recommendations"].append("Add rate limiting with exponential backoff")
 
     if not failures:
-        report["findings"].append({
-            "type": "no_recent_failures",
-            "message": f"No failures found in the last {time_range_minutes} minutes",
-        })
+        report["findings"].append(
+            {
+                "type": "no_recent_failures",
+                "message": f"No failures found in the last {time_range_minutes} minutes",
+            }
+        )
 
     return report
 
@@ -440,7 +435,7 @@ def get_debug_report(
     lines = [
         "=" * 60,
         "RESEARCHCREW DEBUG REPORT",
-        f"Generated: {datetime.now(timezone.utc).isoformat()}Z",
+        f"Generated: {datetime.now(UTC).isoformat()}Z",
         "=" * 60,
         "",
     ]
@@ -451,8 +446,7 @@ def get_debug_report(
         if failures:
             for f in failures[-10:]:  # Last 10
                 lines.append(
-                    f"  [{f.timestamp.strftime('%H:%M:%S')}] "
-                    f"{f.failure_type.value}: {f.component} - {f.error_message}"
+                    f"  [{f.timestamp.strftime('%H:%M:%S')}] {f.failure_type.value}: {f.component} - {f.error_message}"
                 )
         else:
             lines.append("  No failures recorded")
@@ -463,9 +457,7 @@ def get_debug_report(
         metrics_text = get_metrics_text()
         # Show summary of key metrics
         for line in metrics_text.split("\n"):
-            if line.startswith("agent_error_total") or \
-               line.startswith("tool_calls_total") or \
-               line.startswith("# HELP"):
+            if line.startswith("agent_error_total") or line.startswith("tool_calls_total") or line.startswith("# HELP"):
                 if not line.startswith("# HELP"):
                     lines.append(f"  {line}")
         lines.append("")

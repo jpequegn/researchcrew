@@ -22,9 +22,9 @@ import asyncio
 import json
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 from uuid import uuid4
 
 # Add parent directory to path for shared imports
@@ -34,8 +34,6 @@ from shared.utils import (
     MCPError,
     ToolError,
     ValidationError,
-    format_error_response,
-    get_logger,
     setup_logging,
     truncate_text,
     validate_optional_param,
@@ -53,15 +51,13 @@ logger = setup_logging("knowledge-base-server")
 class SimpleKnowledgeBase:
     """Simple file-based knowledge base for MCP server."""
 
-    def __init__(self, storage_path: Optional[str] = None):
+    def __init__(self, storage_path: str | None = None):
         """Initialize knowledge base.
 
         Args:
             storage_path: Path to storage directory. Defaults to ./knowledge_base
         """
-        self.storage_path = Path(
-            storage_path or os.environ.get("KNOWLEDGE_BASE_PATH", "./knowledge_base")
-        )
+        self.storage_path = Path(storage_path or os.environ.get("KNOWLEDGE_BASE_PATH", "./knowledge_base"))
         self.storage_path.mkdir(parents=True, exist_ok=True)
         self._index_file = self.storage_path / "index.json"
         self._load_index()
@@ -83,7 +79,7 @@ class SimpleKnowledgeBase:
     def search(
         self,
         query: str,
-        topic: Optional[str] = None,
+        topic: str | None = None,
         limit: int = 10,
     ) -> list[dict[str, Any]]:
         """Search the knowledge base.
@@ -109,11 +105,7 @@ class SimpleKnowledgeBase:
             title = entry.get("title", "").lower()
             tags = " ".join(entry.get("tags", [])).lower()
 
-            if (
-                query_lower in content
-                or query_lower in title
-                or query_lower in tags
-            ):
+            if query_lower in content or query_lower in title or query_lower in tags:
                 results.append(
                     {
                         "id": entry_id,
@@ -152,8 +144,8 @@ class SimpleKnowledgeBase:
         content: str,
         title: str,
         topic: str,
-        source: Optional[str] = None,
-        tags: Optional[list[str]] = None,
+        source: str | None = None,
+        tags: list[str] | None = None,
     ) -> str:
         """Save a new entry to the knowledge base.
 
@@ -175,7 +167,7 @@ class SimpleKnowledgeBase:
             "topic": topic,
             "source": source,
             "tags": tags or [],
-            "created_at": datetime.now(timezone.utc).isoformat(),
+            "created_at": datetime.now(UTC).isoformat(),
         }
 
         # Save entry
@@ -191,7 +183,7 @@ class SimpleKnowledgeBase:
         logger.info(f"Saved entry {entry_id}: {title}")
         return entry_id
 
-    def get_entry(self, entry_id: str) -> Optional[dict[str, Any]]:
+    def get_entry(self, entry_id: str) -> dict[str, Any] | None:
         """Get a specific entry by ID.
 
         Args:
@@ -250,7 +242,7 @@ class SimpleKnowledgeBase:
 # ============================================================================
 
 # Global knowledge base instance
-_kb: Optional[SimpleKnowledgeBase] = None
+_kb: SimpleKnowledgeBase | None = None
 
 
 def get_knowledge_base() -> SimpleKnowledgeBase:
@@ -265,7 +257,10 @@ def get_knowledge_base() -> SimpleKnowledgeBase:
 TOOLS = [
     {
         "name": "knowledge_search",
-        "description": "Search the knowledge base for relevant information on a topic. Returns matching entries with titles, snippets, and relevance scores.",
+        "description": (
+            "Search the knowledge base for relevant information on a topic. "
+            "Returns matching entries with titles, snippets, and relevance scores."
+        ),
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -288,7 +283,10 @@ TOOLS = [
     },
     {
         "name": "save_to_knowledge",
-        "description": "Save new information to the knowledge base for future reference. Useful for storing research findings, summaries, and important facts.",
+        "description": (
+            "Save new information to the knowledge base for future reference. "
+            "Useful for storing research findings, summaries, and important facts."
+        ),
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -319,7 +317,10 @@ TOOLS = [
     },
     {
         "name": "list_topics",
-        "description": "List all topics in the knowledge base with entry counts. Useful for discovering what information is available.",
+        "description": (
+            "List all topics in the knowledge base with entry counts. "
+            "Useful for discovering what information is available."
+        ),
         "inputSchema": {
             "type": "object",
             "properties": {},

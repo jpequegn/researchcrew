@@ -3,12 +3,13 @@
 Web search and URL reading tools for research agents.
 """
 
+from urllib.parse import quote_plus
+
 import httpx
 from bs4 import BeautifulSoup
 from google.adk import tool
-from urllib.parse import quote_plus
 
-from utils.tracing import trace_span, get_trace_id
+from utils.tracing import get_trace_id, trace_span
 
 
 @tool
@@ -34,9 +35,7 @@ def web_search(query: str) -> str:
             encoded_query = quote_plus(query)
             url = f"https://html.duckduckgo.com/html/?q={encoded_query}"
 
-            headers = {
-                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
-            }
+            headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"}
 
             response = httpx.get(url, headers=headers, timeout=30.0, follow_redirects=True)
             response.raise_for_status()
@@ -93,9 +92,7 @@ def read_url(url: str) -> str:
         },
     ) as span:
         try:
-            headers = {
-                "User-Agent": "Mozilla/5.0 (compatible; ResearchCrew/1.0; +research-assistant)"
-            }
+            headers = {"User-Agent": "Mozilla/5.0 (compatible; ResearchCrew/1.0; +research-assistant)"}
             response = httpx.get(url, headers=headers, timeout=30.0, follow_redirects=True)
             response.raise_for_status()
 

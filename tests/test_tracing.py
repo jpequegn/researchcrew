@@ -3,20 +3,21 @@
 Tests the tracing utilities for ResearchCrew.
 """
 
+from unittest.mock import Mock, patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 
 from utils.tracing import (
-    init_tracing,
+    add_trace_context,
+    get_span_id,
+    get_trace_id,
     get_tracer,
+    init_tracing,
     reset_tracing,
-    trace_span,
-    trace_tool,
     trace_agent,
     trace_llm_call,
-    add_trace_context,
-    get_trace_id,
-    get_span_id,
+    trace_span,
+    trace_tool,
 )
 
 
@@ -193,7 +194,7 @@ class TestTraceLLMCall:
 
     def test_trace_llm_call_success(self):
         """Test recording successful LLM call."""
-        with trace_span("test") as span:
+        with trace_span("test"):
             trace_llm_call(
                 model_name="gemini-2.0-flash",
                 prompt="What is AI?",
@@ -204,7 +205,7 @@ class TestTraceLLMCall:
 
     def test_trace_llm_call_with_error(self):
         """Test recording failed LLM call."""
-        with trace_span("test") as span:
+        with trace_span("test"):
             trace_llm_call(
                 model_name="gemini-2.0-flash",
                 prompt="What is AI?",
@@ -227,7 +228,7 @@ class TestAddTraceContext:
 
     def test_add_trace_context(self):
         """Test adding research context to span."""
-        with trace_span("test") as span:
+        with trace_span("test"):
             add_trace_context(
                 query="What are AI agents?",
                 session_id="session-123",
@@ -251,14 +252,14 @@ class TestTraceIdentifiers:
 
     def test_get_trace_id_in_span(self):
         """Test getting trace ID within a span."""
-        with trace_span("test") as span:
+        with trace_span("test"):
             trace_id = get_trace_id()
             assert trace_id is not None
             assert len(trace_id) == 32  # 128-bit hex
 
     def test_get_span_id_in_span(self):
         """Test getting span ID within a span."""
-        with trace_span("test") as span:
+        with trace_span("test"):
             span_id = get_span_id()
             assert span_id is not None
             assert len(span_id) == 16  # 64-bit hex
@@ -266,7 +267,7 @@ class TestTraceIdentifiers:
     def test_get_trace_id_no_span(self):
         """Test getting trace ID without active span."""
         # Outside any span context
-        trace_id = get_trace_id()
+        get_trace_id()
         # May return None or invalid trace ID
 
 
@@ -295,7 +296,7 @@ class TestToolTracingIntegration:
             mock_response.raise_for_status = Mock()
             mock_get.return_value = mock_response
 
-            with trace_span("test_workflow") as workflow_span:
+            with trace_span("test_workflow"):
                 result = web_search("test query")
 
             # Should return result without error
@@ -310,7 +311,7 @@ class TestToolTracingIntegration:
             mock_kb.search.return_value = []
             mock_get_kb.return_value = mock_kb
 
-            with trace_span("test_workflow") as workflow_span:
+            with trace_span("test_workflow"):
                 result = knowledge_search("test query")
 
             assert "no relevant" in result.lower()
@@ -324,8 +325,8 @@ class TestRunnerTracingIntegration:
         reset_tracing()
         init_tracing(exporter_type="none")
 
-        from utils.session_manager import reset_session_manager
         from utils.context_manager import reset_context_manager
+        from utils.session_manager import reset_session_manager
 
         reset_session_manager()
         reset_context_manager()

@@ -17,10 +17,11 @@ import argparse
 import json
 import logging
 import sys
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from deepeval.test_case import LLMTestCase
 
@@ -28,11 +29,7 @@ from deepeval.test_case import LLMTestCase
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from evals.metrics import (
-    CompletenessMetric,
-    CoherenceMetric,
-    FactualAccuracyMetric,
     ResearchQualityMetric,
-    SourceQualityMetric,
     create_metrics_for_test_case,
     load_golden_dataset,
 )
@@ -72,7 +69,7 @@ class EvaluationReport:
     scores_by_difficulty: dict[str, dict[str, float]]
     scores_by_agent_type: dict[str, dict[str, float]]
     test_case_results: list[dict[str, Any]]
-    filters_applied: dict[str, Optional[str]] = field(default_factory=dict)
+    filters_applied: dict[str, str | None] = field(default_factory=dict)
 
 
 class EvalRunner:
@@ -81,7 +78,7 @@ class EvalRunner:
     def __init__(
         self,
         dataset_path: str = "evals/golden_dataset.jsonl",
-        response_provider: Optional[callable] = None,
+        response_provider: Callable | None = None,
     ):
         """Initialize the eval runner.
 
@@ -101,7 +98,7 @@ class EvalRunner:
         In production, this would be replaced with actual agent execution.
         """
         expected_topics = test_case.get("expected_topics", [])
-        category = test_case.get("category", "research")
+        test_case.get("category", "research")
 
         # Generate a mock response that includes expected topics
         response_parts = [
@@ -112,9 +109,7 @@ class EvalRunner:
         # Add topics
         for i, topic in enumerate(expected_topics, 1):
             response_parts.append(f"{i}. **{topic}**: This is an important aspect to consider. ")
-            response_parts.append(
-                "Research suggests that understanding this concept is crucial for success.\n\n"
-            )
+            response_parts.append("Research suggests that understanding this concept is crucial for success.\n\n")
 
         # Add some sources
         response_parts.append("\n### Sources\n")
@@ -134,10 +129,10 @@ class EvalRunner:
 
     def filter_test_cases(
         self,
-        category: Optional[str] = None,
-        difficulty: Optional[str] = None,
-        agent_type: Optional[str] = None,
-        test_ids: Optional[list[str]] = None,
+        category: str | None = None,
+        difficulty: str | None = None,
+        agent_type: str | None = None,
+        test_ids: list[str] | None = None,
     ) -> list[dict[str, Any]]:
         """Filter test cases by criteria.
 
@@ -244,10 +239,10 @@ class EvalRunner:
 
     def run(
         self,
-        category: Optional[str] = None,
-        difficulty: Optional[str] = None,
-        agent_type: Optional[str] = None,
-        test_ids: Optional[list[str]] = None,
+        category: str | None = None,
+        difficulty: str | None = None,
+        agent_type: str | None = None,
+        test_ids: list[str] | None = None,
     ) -> EvaluationReport:
         """Run evaluation on filtered test cases.
 
@@ -327,9 +322,7 @@ class EvalRunner:
                 scores = [r.metric_scores.get(metric_name, 0) for r in group_results]
                 group_scores[metric_name] = sum(scores) / len(scores) if scores else 0
             group_scores["pass_rate"] = (
-                sum(1 for r in group_results if r.passed) / len(group_results)
-                if group_results
-                else 0
+                sum(1 for r in group_results if r.passed) / len(group_results) if group_results else 0
             )
             aggregated[group_key] = group_scores
 

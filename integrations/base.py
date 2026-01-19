@@ -6,14 +6,14 @@ ResearchCrew agents with external agent frameworks.
 
 import time
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from enum import Enum
-from typing import Any, Callable, Generic, Optional, TypeVar
+from datetime import UTC, datetime
+from typing import Any, Generic, TypeVar
 
 from utils.logging_config import get_logger
-from utils.tracing import trace_span, get_trace_id
-from utils.metrics import record_request_duration, record_error
+from utils.metrics import record_error, record_request_duration
+from utils.tracing import get_trace_id, trace_span
 
 logger = get_logger(__name__)
 
@@ -28,7 +28,7 @@ class AdapterError(Exception):
         self,
         message: str,
         adapter_name: str,
-        original_error: Optional[Exception] = None,
+        original_error: Exception | None = None,
     ):
         super().__init__(message)
         self.adapter_name = adapter_name
@@ -46,7 +46,7 @@ class AdapterError(Exception):
 class ValidationError(AdapterError):
     """Raised when input/output validation fails."""
 
-    def __init__(self, message: str, adapter_name: str, field: Optional[str] = None):
+    def __init__(self, message: str, adapter_name: str, field: str | None = None):
         super().__init__(message, adapter_name)
         self.field = field
 
@@ -89,10 +89,10 @@ class AdapterConfig:
     enable_metrics: bool = True
 
     # Custom state translation function
-    state_translator: Optional[Callable[[Any], Any]] = None
+    state_translator: Callable[[Any], Any] | None = None
 
     # Custom result translator function
-    result_translator: Optional[Callable[[Any], Any]] = None
+    result_translator: Callable[[Any], Any] | None = None
 
 
 @dataclass
@@ -112,7 +112,7 @@ class AdapterResult(Generic[T]):
     success: bool = True
 
     # Optional error message if failed
-    error_message: Optional[str] = None
+    error_message: str | None = None
 
     # Source framework
     source_framework: str = ""
@@ -145,15 +145,15 @@ class AdapterStats:
     failed_calls: int = 0
     total_time: float = 0.0
     average_time: float = 0.0
-    last_call_time: Optional[datetime] = None
-    last_error: Optional[str] = None
+    last_call_time: datetime | None = None
+    last_error: str | None = None
 
-    def record_call(self, execution_time: float, success: bool, error: Optional[str] = None) -> None:
+    def record_call(self, execution_time: float, success: bool, error: str | None = None) -> None:
         """Record a call."""
         self.total_calls += 1
         self.total_time += execution_time
         self.average_time = self.total_time / self.total_calls
-        self.last_call_time = datetime.now(timezone.utc)
+        self.last_call_time = datetime.now(UTC)
 
         if success:
             self.successful_calls += 1
@@ -295,8 +295,8 @@ class ExternalAgentAdapter(ABC, Generic[T, R]):
             AdapterError: If execution fails.
         """
         start_time = time.time()
-        result: Optional[R] = None
-        error_message: Optional[str] = None
+        result: R | None = None
+        error_message: str | None = None
         success = True
 
         # Create span for tracing
@@ -318,7 +318,7 @@ class ExternalAgentAdapter(ABC, Generic[T, R]):
                 translated_input = self._translate_state(input_data)
 
                 # Execute with retry
-                last_error: Optional[Exception] = None
+                last_error: Exception | None = None
                 for attempt in range(self.config.max_retries + 1):
                     try:
                         result = await self._execute(translated_input)
@@ -326,9 +326,7 @@ class ExternalAgentAdapter(ABC, Generic[T, R]):
                     except Exception as e:
                         last_error = e
                         if attempt < self.config.max_retries:
-                            logger.warning(
-                                f"Adapter {self.config.name} attempt {attempt + 1} failed: {e}"
-                            )
+                            logger.warning(f"Adapter {self.config.name} attempt {attempt + 1} failed: {e}")
                             continue
                         raise
 
@@ -343,7 +341,7 @@ class ExternalAgentAdapter(ABC, Generic[T, R]):
 
         except AdapterError:
             success = False
-            error_message = str(last_error) if 'last_error' in dir() and last_error else "Unknown error"
+            error_message = str(last_error) if "last_error" in dir() and last_error else "Unknown error"
             raise
         except Exception as e:
             success = False
@@ -411,7 +409,7 @@ def register_adapter(adapter: ExternalAgentAdapter) -> None:
     _adapters[adapter.config.name] = adapter
 
 
-def get_adapter(name: str) -> Optional[ExternalAgentAdapter]:
+def get_adapter(name: str) -> ExternalAgentAdapter | None:
     """Get a registered adapter.
 
     Args:

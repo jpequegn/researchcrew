@@ -6,7 +6,7 @@ Uses DeepEval framework for LLM-as-judge evaluation.
 
 import json
 import re
-from typing import Any, Optional
+from typing import Any
 
 from deepeval.metrics import BaseMetric
 from deepeval.test_case import LLMTestCase
@@ -36,14 +36,14 @@ class SourceQualityMetric(BaseMetric):
     def __init__(
         self,
         threshold: float = 0.7,
-        model: Optional[str] = None,
+        model: str | None = None,
         include_reason: bool = True,
     ):
         self.threshold = threshold
         self.model = model
         self.include_reason = include_reason
-        self._score: Optional[float] = None
-        self._reason: Optional[str] = None
+        self._score: float | None = None
+        self._reason: str | None = None
 
     @property
     def score(self) -> float:
@@ -63,7 +63,7 @@ class SourceQualityMetric(BaseMetric):
 
         # Extract URLs and source references
         urls = re.findall(r'https?://[^\s<>"{}|\\^`\[\]]+', output)
-        source_refs = re.findall(r'\[(?:Source|Ref|\d+)\]', output, re.IGNORECASE)
+        source_refs = re.findall(r"\[(?:Source|Ref|\d+)\]", output, re.IGNORECASE)
 
         # Score components
         has_sources = len(urls) > 0 or len(source_refs) > 0
@@ -84,9 +84,7 @@ class SourceQualityMetric(BaseMetric):
             "openai.com",
             "microsoft.com",
         ]
-        authoritative_count = sum(
-            1 for url in urls if any(domain in url.lower() for domain in authoritative_domains)
-        )
+        authoritative_count = sum(1 for url in urls if any(domain in url.lower() for domain in authoritative_domains))
 
         # Calculate score
         if not has_sources:
@@ -98,9 +96,7 @@ class SourceQualityMetric(BaseMetric):
         else:
             authority_ratio = authoritative_count / max(len(urls), 1)
             self._score = min(1.0, 0.6 + (0.2 * min(source_count / 3, 1)) + (0.2 * authority_ratio))
-            self._reason = (
-                f"Found {source_count} sources, {authoritative_count} from authoritative domains"
-            )
+            self._reason = f"Found {source_count} sources, {authoritative_count} from authoritative domains"
 
         return self._score
 
@@ -131,8 +127,8 @@ class CompletenessMetric(BaseMetric):
         self.expected_topics = expected_topics
         self.threshold = threshold
         self.include_reason = include_reason
-        self._score: Optional[float] = None
-        self._reason: Optional[str] = None
+        self._score: float | None = None
+        self._reason: str | None = None
         self._covered_topics: list[str] = []
         self._missing_topics: list[str] = []
 
@@ -206,8 +202,8 @@ class CoherenceMetric(BaseMetric):
     ):
         self.threshold = threshold
         self.include_reason = include_reason
-        self._score: Optional[float] = None
-        self._reason: Optional[str] = None
+        self._score: float | None = None
+        self._reason: str | None = None
 
     @property
     def score(self) -> float:
@@ -319,8 +315,8 @@ class FactualAccuracyMetric(BaseMetric):
     ):
         self.threshold = threshold
         self.include_reason = include_reason
-        self._score: Optional[float] = None
-        self._reason: Optional[str] = None
+        self._score: float | None = None
+        self._reason: str | None = None
 
     @property
     def score(self) -> float:
@@ -367,7 +363,7 @@ class FactualAccuracyMetric(BaseMetric):
             reasons.append("Claims could use more hedging")
 
         # Check 2: Sources cited for claims
-        has_citations = bool(re.findall(r'https?://|(?:\[(?:Source|Ref|\d+)\])', output))
+        has_citations = bool(re.findall(r"https?://|(?:\[(?:Source|Ref|\d+)\])", output))
         if has_citations:
             scores.append(1.0)
         else:
@@ -427,7 +423,7 @@ class ResearchQualityMetric(BaseMetric):
     def __init__(
         self,
         expected_topics: list[str],
-        weights: Optional[dict[str, float]] = None,
+        weights: dict[str, float] | None = None,
         threshold: float = 0.75,
         include_reason: bool = True,
     ):
@@ -440,8 +436,8 @@ class ResearchQualityMetric(BaseMetric):
         }
         self.threshold = threshold
         self.include_reason = include_reason
-        self._score: Optional[float] = None
-        self._reason: Optional[str] = None
+        self._score: float | None = None
+        self._reason: str | None = None
         self._component_scores: dict[str, float] = {}
 
     @property
@@ -472,14 +468,10 @@ class ResearchQualityMetric(BaseMetric):
         }
 
         # Calculate weighted average
-        self._score = sum(
-            self._component_scores[key] * self.weights[key] for key in self._component_scores
-        )
+        self._score = sum(self._component_scores[key] * self.weights[key] for key in self._component_scores)
 
         # Build reason
-        score_summary = ", ".join(
-            f"{key}: {score:.2f}" for key, score in self._component_scores.items()
-        )
+        score_summary = ", ".join(f"{key}: {score:.2f}" for key, score in self._component_scores.items())
         self._reason = f"Component scores: {score_summary}"
 
         return self._score
@@ -534,7 +526,7 @@ def load_golden_dataset(filepath: str = "evals/golden_dataset.jsonl") -> list[di
         List of test case dictionaries
     """
     test_cases = []
-    with open(filepath, "r") as f:
+    with open(filepath) as f:
         for line in f:
             line = line.strip()
             if line:

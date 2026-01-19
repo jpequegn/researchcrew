@@ -17,8 +17,9 @@ sys.modules["google.adk"] = mock_adk
 
 # Now we can safely import the project modules
 import pytest
-from utils.session_manager import reset_session_manager
+
 from utils.context_manager import reset_context_manager
+from utils.session_manager import reset_session_manager
 
 
 @pytest.fixture(autouse=True)

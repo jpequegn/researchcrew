@@ -22,7 +22,7 @@ import os
 import re
 import sys
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import urlparse
 
 # Add parent directory to path for shared imports
@@ -32,10 +32,9 @@ from shared.utils import (
     MCPError,
     ToolError,
     ValidationError,
-    get_logger,
+    clean_text,
     setup_logging,
     truncate_text,
-    clean_text,
     validate_optional_param,
     validate_required_param,
 )
@@ -144,13 +143,16 @@ def _mock_search_results(query: str) -> dict[str, Any]:
             {
                 "title": f"Example Result for: {query}",
                 "url": "https://example.com/1",
-                "snippet": f"This is a mock result for the query: {query}. In production, this would be real search results from the Serper API.",
+                "snippet": (
+                    f"This is a mock result for the query: {query}. "
+                    "In production, this would be real search results from the Serper API."
+                ),
                 "position": 1,
             },
             {
                 "title": f"Another Result about {query}",
                 "url": "https://example.com/2",
-                "snippet": f"More information about {query}. Set SERPER_API_KEY to get real results.",
+                "snippet": f"More information about {query}. Set SERPER_API_KEY for real results.",
                 "position": 2,
             },
         ],
@@ -308,7 +310,9 @@ def _extract_html_content(
 TOOLS = [
     {
         "name": "web_search",
-        "description": "Search the web for information on any topic. Returns search results with titles, URLs, and snippets.",
+        "description": (
+            "Search the web for information on any topic. Returns search results with titles, URLs, and snippets."
+        ),
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -333,7 +337,9 @@ TOOLS = [
     },
     {
         "name": "read_url",
-        "description": "Fetch and extract content from a URL. Useful for reading articles, documentation, or any web page.",
+        "description": (
+            "Fetch and extract content from a URL. Useful for reading articles, documentation, or any web page."
+        ),
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -374,12 +380,8 @@ async def handle_tool_call(name: str, arguments: dict[str, Any]) -> Any:
     try:
         if name == "web_search":
             query = validate_required_param(arguments, "query", str)
-            num_results = validate_optional_param(
-                arguments, "num_results", default=10, param_type=int
-            )
-            search_type = validate_optional_param(
-                arguments, "search_type", default="search", param_type=str
-            )
+            num_results = validate_optional_param(arguments, "num_results", default=10, param_type=int)
+            search_type = validate_optional_param(arguments, "search_type", default="search", param_type=str)
 
             result = await search_web(
                 query=query,
@@ -390,12 +392,8 @@ async def handle_tool_call(name: str, arguments: dict[str, Any]) -> Any:
 
         elif name == "read_url":
             url = validate_required_param(arguments, "url", str)
-            max_length = validate_optional_param(
-                arguments, "max_length", default=50000, param_type=int
-            )
-            extract_links = validate_optional_param(
-                arguments, "extract_links", default=False, param_type=bool
-            )
+            max_length = validate_optional_param(arguments, "max_length", default=50000, param_type=int)
+            extract_links = validate_optional_param(arguments, "extract_links", default=False, param_type=bool)
 
             result = await read_url(
                 url=url,

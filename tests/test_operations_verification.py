@@ -9,52 +9,48 @@ This file validates Issue #18 requirements:
 """
 
 import time
-from unittest.mock import Mock, patch, MagicMock
 
 import pytest
 
-from utils.tracing import (
-    init_tracing,
-    get_tracer,
-    reset_tracing,
-    trace_span,
-    trace_tool,
-    trace_agent,
-    trace_llm_call,
-    add_trace_context,
-    get_trace_id,
-    get_span_id,
-)
-from utils.metrics import (
-    init_metrics,
-    reset_metrics,
-    record_request_duration,
-    record_error,
-    record_token_usage,
-    record_tool_call,
-    get_metrics_text,
-)
 from utils.circuit_breaker import (
     CircuitBreaker,
     CircuitBreakerConfig,
     CircuitOpenError,
     CircuitState,
-    get_circuit_breaker,
-    reset_all_circuit_breakers,
-    clear_circuit_breakers,
     circuit_breaker_call,
+    clear_circuit_breakers,
+    get_circuit_breaker,
+)
+from utils.metrics import (
+    get_metrics_text,
+    init_metrics,
+    record_error,
+    record_request_duration,
+    record_token_usage,
+    record_tool_call,
+    reset_metrics,
 )
 from utils.resilience import (
-    retry_with_backoff,
-    classify_error,
-    TransientError,
     PermanentError,
     RateLimitError,
     RetryConfig,
     RetryPolicy,
+    TransientError,
+    classify_error,
     get_retry_wait,
+    retry_with_backoff,
 )
-
+from utils.tracing import (
+    get_span_id,
+    get_trace_id,
+    get_tracer,
+    init_tracing,
+    reset_tracing,
+    trace_agent,
+    trace_llm_call,
+    trace_span,
+    trace_tool,
+)
 
 # ============================================================================
 # Tracing Verification Tests
@@ -173,11 +169,7 @@ class TestTracingDecorators:
         # trace_llm_call is a context manager for tracing LLM calls
         with trace_span("test_operation"):
             # Call trace_llm_call as a function
-            trace_llm_call(
-                model_name="gemini-2.0-flash",
-                prompt="test prompt",
-                response="test response"
-            )
+            trace_llm_call(model_name="gemini-2.0-flash", prompt="test prompt", response="test response")
             # Should not raise
             assert True
 
@@ -498,10 +490,7 @@ class TestRetryLogicOperational:
         error = TransientError("test")
 
         # With jitter, delays should vary
-        delays = [
-            get_retry_wait(error, attempt=1, policy=config)
-            for _ in range(10)
-        ]
+        delays = [get_retry_wait(error, attempt=1, policy=config) for _ in range(10)]
 
         # Not all delays should be identical (due to jitter)
         assert len(set(delays)) > 1

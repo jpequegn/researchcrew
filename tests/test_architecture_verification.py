@@ -18,36 +18,26 @@ Tests focus on:
 4. Workflow integration (testable via runner)
 """
 
-import os
-import shutil
-import tempfile
-from unittest.mock import MagicMock, patch
-
-import pytest
-
 # Import agent instruction strings (always available, not mocked)
+from agents.fact_checker import FACT_CHECKER_INSTRUCTIONS
 from agents.orchestrator import ORCHESTRATOR_INSTRUCTIONS
 from agents.researcher import RESEARCHER_INSTRUCTIONS
 from agents.synthesizer import SYNTHESIZER_INSTRUCTIONS
-from agents.fact_checker import FACT_CHECKER_INSTRUCTIONS
 from agents.writer import WRITER_INSTRUCTIONS
-
-# Import memory systems
-from utils.session_manager import (
-    SessionManager,
-    get_session_manager,
-    reset_session_manager,
-)
-from utils.knowledge_base import (
-    KnowledgeBaseManager,
-    get_knowledge_base,
-    reset_knowledge_base,
-)
-from utils.context_manager import reset_context_manager
 
 # Import workflow runner
 from runner import ResearchCrewRunner
+from utils.context_manager import reset_context_manager
+from utils.knowledge_base import (
+    KnowledgeBaseManager,
+    reset_knowledge_base,
+)
 
+# Import memory systems
+from utils.session_manager import (
+    get_session_manager,
+    reset_session_manager,
+)
 
 # ============================================================================
 # Multi-Agent Orchestration Tests
@@ -61,6 +51,7 @@ class TestMultiAgentOrchestration:
         """Test that orchestrator module can be imported."""
         # If these imports work, the module structure is correct
         from agents.orchestrator import orchestrator_agent, research_phase
+
         assert orchestrator_agent is not None
         assert research_phase is not None
 
@@ -113,11 +104,11 @@ class TestHierarchicalDelegation:
     def test_workflow_module_structure(self):
         """Test that all workflow modules can be imported."""
         # These imports verify the delegation structure exists
+        from agents.fact_checker import fact_checker_agent
+        from agents.orchestrator import orchestrator_agent, research_phase
         from agents.researcher import researcher_agent
         from agents.synthesizer import synthesizer_agent
-        from agents.fact_checker import fact_checker_agent
         from agents.writer import writer_agent
-        from agents.orchestrator import orchestrator_agent, research_phase
 
         # All should be non-None (even if mocked)
         assert researcher_agent is not None
@@ -149,7 +140,8 @@ class TestAllAgentsFunctioning:
 
     def test_researcher_agent_module(self):
         """Test researcher agent module imports correctly."""
-        from agents.researcher import researcher_agent, RESEARCHER_INSTRUCTIONS
+        from agents.researcher import RESEARCHER_INSTRUCTIONS, researcher_agent
+
         assert researcher_agent is not None
         assert RESEARCHER_INSTRUCTIONS is not None
 
@@ -164,7 +156,8 @@ class TestAllAgentsFunctioning:
 
     def test_synthesizer_agent_module(self):
         """Test synthesizer agent module imports correctly."""
-        from agents.synthesizer import synthesizer_agent, SYNTHESIZER_INSTRUCTIONS
+        from agents.synthesizer import SYNTHESIZER_INSTRUCTIONS, synthesizer_agent
+
         assert synthesizer_agent is not None
         assert SYNTHESIZER_INSTRUCTIONS is not None
 
@@ -179,7 +172,8 @@ class TestAllAgentsFunctioning:
 
     def test_fact_checker_agent_module(self):
         """Test fact checker agent module imports correctly."""
-        from agents.fact_checker import fact_checker_agent, FACT_CHECKER_INSTRUCTIONS
+        from agents.fact_checker import FACT_CHECKER_INSTRUCTIONS, fact_checker_agent
+
         assert fact_checker_agent is not None
         assert FACT_CHECKER_INSTRUCTIONS is not None
 
@@ -194,7 +188,8 @@ class TestAllAgentsFunctioning:
 
     def test_writer_agent_module(self):
         """Test writer agent module imports correctly."""
-        from agents.writer import writer_agent, WRITER_INSTRUCTIONS
+        from agents.writer import WRITER_INSTRUCTIONS, writer_agent
+
         assert writer_agent is not None
         assert WRITER_INSTRUCTIONS is not None
 
@@ -209,7 +204,8 @@ class TestAllAgentsFunctioning:
 
     def test_orchestrator_agent_module(self):
         """Test orchestrator agent module imports correctly."""
-        from agents.orchestrator import orchestrator_agent, ORCHESTRATOR_INSTRUCTIONS
+        from agents.orchestrator import ORCHESTRATOR_INSTRUCTIONS, orchestrator_agent
+
         assert orchestrator_agent is not None
         assert ORCHESTRATOR_INSTRUCTIONS is not None
 
@@ -589,10 +585,10 @@ class TestArchitectureIntegration:
     def test_full_workflow_structure(self):
         """Test that full workflow structure is correct via imports."""
         # All agent modules should be importable
+        from agents.fact_checker import fact_checker_agent
         from agents.orchestrator import orchestrator_agent, research_phase
         from agents.researcher import researcher_agent
         from agents.synthesizer import synthesizer_agent
-        from agents.fact_checker import fact_checker_agent
         from agents.writer import writer_agent
 
         # All should exist (even if mocked)

@@ -24,14 +24,15 @@ Usage:
 
 import threading
 import time
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from collections.abc import Callable
+from dataclasses import dataclass
+from datetime import UTC, datetime
 from enum import Enum
 from functools import wraps
-from typing import Any, Callable, Optional, TypeVar
+from typing import Any, TypeVar
 
-from utils.metrics import record_error
 from utils.logging_config import get_logger
+from utils.metrics import record_error
 from utils.tracing import get_trace_id, trace_span
 
 logger = get_logger(__name__)
@@ -53,8 +54,8 @@ class CircuitOpenError(Exception):
     def __init__(
         self,
         circuit_name: str,
-        message: Optional[str] = None,
-        retry_after: Optional[float] = None,
+        message: str | None = None,
+        retry_after: float | None = None,
     ):
         self.circuit_name = circuit_name
         self.retry_after = retry_after
@@ -119,8 +120,8 @@ class CircuitBreakerStats:
     total_calls: int
     total_failures: int
     total_trips: int  # Times circuit opened
-    last_failure_time: Optional[datetime]
-    last_state_change: Optional[datetime]
+    last_failure_time: datetime | None
+    last_state_change: datetime | None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -131,12 +132,8 @@ class CircuitBreakerStats:
             "total_calls": self.total_calls,
             "total_failures": self.total_failures,
             "total_trips": self.total_trips,
-            "last_failure_time": (
-                self.last_failure_time.isoformat() if self.last_failure_time else None
-            ),
-            "last_state_change": (
-                self.last_state_change.isoformat() if self.last_state_change else None
-            ),
+            "last_failure_time": (self.last_failure_time.isoformat() if self.last_failure_time else None),
+            "last_state_change": (self.last_state_change.isoformat() if self.last_state_change else None),
         }
 
 
@@ -158,9 +155,9 @@ class CircuitBreaker:
     def __init__(
         self,
         name: str,
-        config: Optional[CircuitBreakerConfig] = None,
-        fallback: Optional[Callable[..., Any]] = None,
-        on_state_change: Optional[Callable[[CircuitState, CircuitState], None]] = None,
+        config: CircuitBreakerConfig | None = None,
+        fallback: Callable[..., Any] | None = None,
+        on_state_change: Callable[[CircuitState, CircuitState], None] | None = None,
     ):
         """Initialize circuit breaker.
 
@@ -179,9 +176,9 @@ class CircuitBreaker:
         self._failure_times: list[float] = []
         self._success_count = 0
         self._half_open_calls = 0
-        self._last_failure_time: Optional[datetime] = None
-        self._last_state_change: Optional[datetime] = None
-        self._opened_at: Optional[float] = None
+        self._last_failure_time: datetime | None = None
+        self._last_state_change: datetime | None = None
+        self._opened_at: float | None = None
 
         # Counters for stats
         self._total_calls = 0
@@ -214,7 +211,7 @@ class CircuitBreaker:
             return
 
         self._state = new_state
-        self._last_state_change = datetime.now(timezone.utc)
+        self._last_state_change = datetime.now(UTC)
 
         if new_state == CircuitState.OPEN:
             self._opened_at = time.time()
@@ -266,7 +263,7 @@ class CircuitBreaker:
         """Record a failure."""
         now = time.time()
         self._failure_times.append(now)
-        self._last_failure_time = datetime.now(timezone.utc)
+        self._last_failure_time = datetime.now(UTC)
         self._total_failures += 1
 
         # Remove old failures outside the window
@@ -363,7 +360,7 @@ class CircuitBreaker:
 
                 return result
 
-            except Exception as e:
+            except Exception:
                 with self._lock:
                     self._record_failure()
 
@@ -399,7 +396,7 @@ class CircuitBreaker:
             self._success_count = 0
             self._half_open_calls = 0
             self._opened_at = None
-            self._last_state_change = datetime.now(timezone.utc)
+            self._last_state_change = datetime.now(UTC)
             logger.info(f"Circuit '{self.name}' manually reset")
 
     def force_open(self) -> None:
@@ -419,9 +416,9 @@ _registry_lock = threading.Lock()
 
 def get_circuit_breaker(
     name: str,
-    config: Optional[CircuitBreakerConfig] = None,
-    preset: Optional[CircuitBreakerPreset] = None,
-    fallback: Optional[Callable[..., Any]] = None,
+    config: CircuitBreakerConfig | None = None,
+    preset: CircuitBreakerPreset | None = None,
+    fallback: Callable[..., Any] | None = None,
 ) -> CircuitBreaker:
     """Get or create a circuit breaker by name.
 
@@ -488,9 +485,9 @@ def get_all_circuit_stats() -> dict[str, CircuitBreakerStats]:
 
 def circuit_breaker_call(
     name: str,
-    config: Optional[CircuitBreakerConfig] = None,
-    preset: Optional[CircuitBreakerPreset] = None,
-    fallback: Optional[Callable[..., Any]] = None,
+    config: CircuitBreakerConfig | None = None,
+    preset: CircuitBreakerPreset | None = None,
+    fallback: Callable[..., Any] | None = None,
 ) -> Callable[[F], F]:
     """Decorator to protect a function with a circuit breaker.
 
@@ -535,9 +532,7 @@ def get_circuit_breaker_status() -> dict[str, Any]:
     stats = get_all_circuit_stats()
 
     open_circuits = [name for name, s in stats.items() if s.state == CircuitState.OPEN]
-    half_open_circuits = [
-        name for name, s in stats.items() if s.state == CircuitState.HALF_OPEN
-    ]
+    half_open_circuits = [name for name, s in stats.items() if s.state == CircuitState.HALF_OPEN]
 
     return {
         "total_circuits": len(stats),

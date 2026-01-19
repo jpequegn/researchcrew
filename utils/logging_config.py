@@ -14,7 +14,7 @@ Usage:
 import logging
 import sys
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 try:
     from pythonjsonlogger.json import JsonFormatter as jsonlogger
@@ -29,7 +29,7 @@ except ImportError:
     except ImportError:
         JSON_LOGGER_AVAILABLE = False
 
-from utils.tracing import get_trace_id, get_span_id
+from utils.tracing import get_span_id, get_trace_id
 
 # Custom log record factory to add trace context
 _original_factory = logging.getLogRecordFactory()
@@ -131,7 +131,7 @@ def configure_logging(
     level: str = "INFO",
     json_format: bool = False,
     include_trace: bool = True,
-    log_file: Optional[str] = None,
+    log_file: str | None = None,
 ) -> None:
     """Configure logging for the application.
 
@@ -159,9 +159,7 @@ def configure_logging(
 
     if json_format and JSON_LOGGER_AVAILABLE:
         # JSON format for production
-        formatter = CustomJsonFormatter(
-            "%(timestamp)s %(level)s %(name)s %(message)s"
-        )
+        formatter = CustomJsonFormatter("%(timestamp)s %(level)s %(name)s %(message)s")
     else:
         # Human-readable format for development
         formatter = ConsoleFormatter(
@@ -183,13 +181,9 @@ def configure_logging(
         file_handler.setLevel(getattr(logging, level.upper()))
 
         if JSON_LOGGER_AVAILABLE:
-            file_formatter = CustomJsonFormatter(
-                "%(timestamp)s %(level)s %(name)s %(message)s"
-            )
+            file_formatter = CustomJsonFormatter("%(timestamp)s %(level)s %(name)s %(message)s")
         else:
-            file_formatter = logging.Formatter(
-                "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-            )
+            file_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
         file_handler.setFormatter(file_formatter)
 

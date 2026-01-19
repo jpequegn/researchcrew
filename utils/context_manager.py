@@ -7,7 +7,6 @@ to handle long research sessions without context overflow.
 import logging
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional
 
 import tiktoken
 
@@ -127,7 +126,7 @@ class ContextWarning:
     level: str  # "info", "warning", "critical"
     message: str
     usage_percent: float
-    suggested_action: Optional[str] = None
+    suggested_action: str | None = None
 
 
 @dataclass
@@ -163,10 +162,7 @@ class TokenCounter:
             # Fallback to cl100k_base if encoding not found
             self._encoder = tiktoken.get_encoding("cl100k_base")
 
-        logger.info(
-            f"TokenCounter initialized for {model_name} "
-            f"(max_context={self.config.max_context_tokens:,})"
-        )
+        logger.info(f"TokenCounter initialized for {model_name} (max_context={self.config.max_context_tokens:,})")
 
     def count_tokens(self, text: str) -> int:
         """Count tokens in a text string.
@@ -255,7 +251,7 @@ class TokenCounter:
             return 1.0
         return current_usage / available
 
-    def check_usage(self, current_usage: int) -> Optional[ContextWarning]:
+    def check_usage(self, current_usage: int) -> ContextWarning | None:
         """Check context usage and return warning if needed.
 
         Args:
@@ -398,15 +394,11 @@ class ContextCompressor:
                     compressed_older.append(turn)
 
             # Check if still over budget
-            total_older_tokens = sum(
-                self.token_counter.count_tokens(t) for t in compressed_older
-            )
+            total_older_tokens = sum(self.token_counter.count_tokens(t) for t in compressed_older)
             while total_older_tokens > remaining_budget and compressed_older:
                 compressed_older.pop(0)
                 items_removed += 1
-                total_older_tokens = sum(
-                    self.token_counter.count_tokens(t) for t in compressed_older
-                )
+                total_older_tokens = sum(self.token_counter.count_tokens(t) for t in compressed_older)
         else:
             items_removed = len(older_turns)
 
@@ -468,9 +460,7 @@ class ContextCompressor:
 
         # Add older facts if budget allows
         compressed_facts = list(recent_facts)
-        remaining_budget = target_tokens - sum(
-            self.token_counter.count_tokens(f) for f in compressed_facts
-        )
+        remaining_budget = target_tokens - sum(self.token_counter.count_tokens(f) for f in compressed_facts)
 
         items_removed = 0
         for fact in reversed(facts[:-keep_recent] if len(facts) > keep_recent else []):
@@ -515,10 +505,7 @@ class ContextWindow:
     @property
     def available_tokens(self) -> int:
         """Get total available tokens for context."""
-        return (
-            self.token_counter.config.max_context_tokens
-            - self.token_counter.config.max_output_tokens
-        )
+        return self.token_counter.config.max_context_tokens - self.token_counter.config.max_output_tokens
 
     @property
     def history_budget(self) -> int:
@@ -589,9 +576,7 @@ class ContextWindow:
                     conversation_history,
                     self.history_budget,
                 )
-                processed_history = (
-                    compressed.content.split("\n\n") if compressed.content else []
-                )
+                processed_history = compressed.content.split("\n\n") if compressed.content else []
                 logger.info(
                     f"Compressed history: {compressed.original_tokens} -> "
                     f"{compressed.compressed_tokens} tokens "
@@ -606,9 +591,7 @@ class ContextWindow:
                     self.facts_budget,
                 )
                 # Extract facts from formatted string
-                processed_facts = [
-                    line[2:] for line in compressed.content.split("\n") if line.startswith("- ")
-                ]
+                processed_facts = [line[2:] for line in compressed.content.split("\n") if line.startswith("- ")]
                 logger.info(
                     f"Compressed facts: {compressed.original_tokens} -> "
                     f"{compressed.compressed_tokens} tokens "
@@ -771,7 +754,7 @@ class ContextManager:
 
 
 # Global instance management
-_context_manager: Optional[ContextManager] = None
+_context_manager: ContextManager | None = None
 
 
 def get_context_manager(model_name: str = "gemini-2.0-flash") -> ContextManager:

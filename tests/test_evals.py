@@ -15,8 +15,8 @@ pytest.importorskip("deepeval", reason="deepeval not installed")
 from deepeval.test_case import LLMTestCase
 
 from evals.metrics import (
-    CompletenessMetric,
     CoherenceMetric,
+    CompletenessMetric,
     FactualAccuracyMetric,
     ResearchQualityMetric,
     SourceQualityMetric,
@@ -387,10 +387,7 @@ class TestEvalRunner:
         runner = EvalRunner(str(self.dataset_path))
         filtered = runner.filter_test_cases(category="comparison", difficulty="hard")
 
-        assert all(
-            tc.get("category") == "comparison" and tc.get("difficulty") == "hard"
-            for tc in filtered
-        )
+        assert all(tc.get("category") == "comparison" and tc.get("difficulty") == "hard" for tc in filtered)
 
     def test_evaluate_single_test_case(self):
         """Test evaluating a single test case."""

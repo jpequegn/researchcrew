@@ -5,8 +5,7 @@ Common functionality used across all ResearchCrew MCP servers.
 
 import logging
 import sys
-from typing import Any, Optional
-
+from typing import Any
 
 # ============================================================================
 # Custom Exceptions
@@ -20,7 +19,7 @@ class MCPError(Exception):
         self,
         message: str,
         error_code: str = "MCP_ERROR",
-        details: Optional[dict[str, Any]] = None,
+        details: dict[str, Any] | None = None,
     ):
         super().__init__(message)
         self.message = message
@@ -40,7 +39,7 @@ class MCPError(Exception):
 class ValidationError(MCPError):
     """Raised when input validation fails."""
 
-    def __init__(self, message: str, field: Optional[str] = None):
+    def __init__(self, message: str, field: str | None = None):
         super().__init__(
             message=message,
             error_code="VALIDATION_ERROR",
@@ -56,7 +55,7 @@ class ToolError(MCPError):
         self,
         message: str,
         tool_name: str,
-        original_error: Optional[Exception] = None,
+        original_error: Exception | None = None,
     ):
         super().__init__(
             message=message,
@@ -108,7 +107,7 @@ def format_error_response(
 
 def format_success_response(
     data: Any,
-    metadata: Optional[dict[str, Any]] = None,
+    metadata: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Format a successful response.
 
@@ -136,7 +135,7 @@ def format_success_response(
 def validate_required_param(
     params: dict[str, Any],
     param_name: str,
-    param_type: Optional[type] = None,
+    param_type: type | None = None,
 ) -> Any:
     """Validate that a required parameter exists and has correct type.
 
@@ -178,7 +177,7 @@ def validate_optional_param(
     params: dict[str, Any],
     param_name: str,
     default: Any = None,
-    param_type: Optional[type] = None,
+    param_type: type | None = None,
 ) -> Any:
     """Validate an optional parameter if present.
 
@@ -221,7 +220,7 @@ _loggers: dict[str, logging.Logger] = {}
 def setup_logging(
     name: str,
     level: int = logging.INFO,
-    format_string: Optional[str] = None,
+    format_string: str | None = None,
 ) -> logging.Logger:
     """Set up logging for an MCP server.
 

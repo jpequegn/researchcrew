@@ -47,11 +47,15 @@ build-backend = "hatchling.build"
 packages = ["agents", "schemas", "tools", "utils"]
 
 [tool.ruff]
-line-length = 100
+line-length = 120
 target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP"]
+ignore = ["N813"]  # Allow CamelCase imports as lowercase
+
+[tool.ruff.lint.per-file-ignores]
+"tests/conftest.py" = ["E402"]  # Allow imports after sys.modules manipulation
 
 [tool.mypy]
 python_version = "3.11"

@@ -7,7 +7,7 @@ to remember previous research within the same session.
 import logging
 import uuid
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -20,7 +20,7 @@ class ConversationTurn(BaseModel):
     turn_id: int = Field(description="Turn number in the conversation")
     timestamp: str = Field(description="ISO timestamp of the turn")
     query: str = Field(description="User's query")
-    summary: Optional[str] = Field(default=None, description="Summary of research results")
+    summary: str | None = Field(default=None, description="Summary of research results")
     findings_count: int = Field(default=0, description="Number of findings produced")
     sources_count: int = Field(default=0, description="Number of sources cited")
 
@@ -40,21 +40,13 @@ class SessionState(BaseModel):
     )
 
     # Research context for follow-ups
-    last_query: Optional[str] = Field(default=None, description="Most recent query")
-    last_findings_summary: Optional[str] = Field(
-        default=None, description="Summary of most recent findings"
-    )
-    topics_researched: list[str] = Field(
-        default_factory=list, description="List of topics researched in this session"
-    )
+    last_query: str | None = Field(default=None, description="Most recent query")
+    last_findings_summary: str | None = Field(default=None, description="Summary of most recent findings")
+    topics_researched: list[str] = Field(default_factory=list, description="List of topics researched in this session")
 
     # Accumulated knowledge within session
-    key_facts: list[str] = Field(
-        default_factory=list, description="Key facts discovered in this session"
-    )
-    sources_used: list[str] = Field(
-        default_factory=list, description="URLs of sources used in this session"
-    )
+    key_facts: list[str] = Field(default_factory=list, description="Key facts discovered in this session")
+    sources_used: list[str] = Field(default_factory=list, description="URLs of sources used in this session")
 
 
 class SessionManager:
@@ -72,7 +64,7 @@ class SessionManager:
     def create_session(
         self,
         user_id: str = "default_user",
-        session_id: Optional[str] = None,
+        session_id: str | None = None,
     ) -> SessionState:
         """Create a new session.
 
@@ -100,7 +92,7 @@ class SessionManager:
 
         return session
 
-    def get_session(self, session_id: str) -> Optional[SessionState]:
+    def get_session(self, session_id: str) -> SessionState | None:
         """Retrieve an existing session.
 
         Args:
@@ -118,7 +110,7 @@ class SessionManager:
 
     def get_or_create_session(
         self,
-        session_id: Optional[str] = None,
+        session_id: str | None = None,
         user_id: str = "default_user",
     ) -> SessionState:
         """Get an existing session or create a new one.
@@ -141,10 +133,10 @@ class SessionManager:
         self,
         session_id: str,
         query: str,
-        summary: Optional[str] = None,
+        summary: str | None = None,
         findings_count: int = 0,
         sources_count: int = 0,
-    ) -> Optional[ConversationTurn]:
+    ) -> ConversationTurn | None:
         """Add a conversation turn to the session history.
 
         Args:
@@ -184,10 +176,10 @@ class SessionManager:
     def update_session_context(
         self,
         session_id: str,
-        topics: Optional[list[str]] = None,
-        key_facts: Optional[list[str]] = None,
-        sources: Optional[list[str]] = None,
-        findings_summary: Optional[str] = None,
+        topics: list[str] | None = None,
+        key_facts: list[str] | None = None,
+        sources: list[str] | None = None,
+        findings_summary: str | None = None,
     ) -> bool:
         """Update the session's accumulated context.
 
@@ -267,9 +259,7 @@ class SessionManager:
 
         # Add topics researched
         if session.topics_researched:
-            context_parts.append(
-                f"## Topics Researched: {', '.join(session.topics_researched[-10:])}\n"
-            )
+            context_parts.append(f"## Topics Researched: {', '.join(session.topics_researched[-10:])}\n")
 
         return "\n".join(context_parts)
 
@@ -288,7 +278,7 @@ class SessionManager:
             return True
         return False
 
-    def list_sessions(self, user_id: Optional[str] = None) -> list[SessionState]:
+    def list_sessions(self, user_id: str | None = None) -> list[SessionState]:
         """List all sessions, optionally filtered by user.
 
         Args:
@@ -328,7 +318,7 @@ class SessionManager:
 
 
 # Global session manager instance (singleton pattern for the application)
-_session_manager: Optional[SessionManager] = None
+_session_manager: SessionManager | None = None
 
 
 def get_session_manager() -> SessionManager:

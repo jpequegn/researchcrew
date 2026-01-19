@@ -17,26 +17,24 @@ Usage:
         ...
 """
 
-import logging
 import random
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
 from functools import wraps
-from typing import Any, Callable, Optional, Type, TypeVar, Union
+from typing import Any, TypeVar
 
 import tenacity
 from tenacity import (
     RetryError,
-    retry,
-    retry_if_exception_type,
     stop_after_attempt,
     wait_exponential,
     wait_random,
 )
 
-from utils.metrics import record_error, record_tool_call
 from utils.logging_config import get_logger
+from utils.metrics import record_error, record_tool_call
 from utils.tracing import get_trace_id, trace_span
 
 logger = get_logger(__name__)
@@ -58,8 +56,8 @@ class TransientError(Exception):
     def __init__(
         self,
         message: str,
-        original_error: Optional[Exception] = None,
-        retry_after: Optional[float] = None,
+        original_error: Exception | None = None,
+        retry_after: float | None = None,
     ):
         super().__init__(message)
         self.original_error = original_error
@@ -75,8 +73,8 @@ class PermanentError(Exception):
     def __init__(
         self,
         message: str,
-        original_error: Optional[Exception] = None,
-        error_code: Optional[str] = None,
+        original_error: Exception | None = None,
+        error_code: str | None = None,
     ):
         super().__init__(message)
         self.original_error = original_error
@@ -89,7 +87,7 @@ class RateLimitError(TransientError):
     def __init__(
         self,
         message: str = "Rate limit exceeded",
-        retry_after: Optional[float] = None,
+        retry_after: float | None = None,
     ):
         super().__init__(message, retry_after=retry_after)
 
@@ -104,7 +102,7 @@ class TimeoutError(TransientError):
 class NetworkError(TransientError):
     """Specific error for network issues."""
 
-    def __init__(self, message: str = "Network error", original_error: Optional[Exception] = None):
+    def __init__(self, message: str = "Network error", original_error: Exception | None = None):
         super().__init__(message, original_error=original_error)
 
 
@@ -115,7 +113,7 @@ class ServerError(TransientError):
         self,
         message: str = "Server error",
         status_code: int = 500,
-        original_error: Optional[Exception] = None,
+        original_error: Exception | None = None,
     ):
         super().__init__(message, original_error=original_error)
         self.status_code = status_code
@@ -128,7 +126,7 @@ class ClientError(PermanentError):
         self,
         message: str = "Client error",
         status_code: int = 400,
-        original_error: Optional[Exception] = None,
+        original_error: Exception | None = None,
     ):
         super().__init__(message, original_error=original_error, error_code=str(status_code))
         self.status_code = status_code
@@ -144,12 +142,12 @@ class AuthenticationError(PermanentError):
 class ValidationError(PermanentError):
     """Specific error for validation failures."""
 
-    def __init__(self, message: str = "Validation failed", field: Optional[str] = None):
+    def __init__(self, message: str = "Validation failed", field: str | None = None):
         super().__init__(message, error_code="VALIDATION_ERROR")
         self.field = field
 
 
-def classify_error(error: Exception) -> Union[TransientError, PermanentError]:
+def classify_error(error: Exception) -> TransientError | PermanentError:
     """Classify an error as transient or permanent.
 
     Args:
@@ -171,10 +169,7 @@ def classify_error(error: Exception) -> Union[TransientError, PermanentError]:
         return TimeoutError(str(error))
 
     # Check for connection errors
-    if any(
-        term in error_message
-        for term in ("connection", "network", "refused", "unreachable", "dns")
-    ):
+    if any(term in error_message for term in ("connection", "network", "refused", "unreachable", "dns")):
         return NetworkError(str(error), original_error=error)
 
     # Check for rate limit errors
@@ -228,7 +223,7 @@ class RetryConfig:
     max_wait: float = 60.0  # seconds
     multiplier: float = 2.0  # exponential multiplier
     jitter: float = 0.5  # random jitter factor (0-1)
-    timeout: Optional[float] = None  # total operation timeout
+    timeout: float | None = None  # total operation timeout
 
 
 class RetryPolicy(Enum):
@@ -318,8 +313,8 @@ class RetryStats:
     attempts: int
     final_status: str  # "success", "failure", "exhausted"
     total_time: float
-    last_error: Optional[str] = None
-    trace_id: Optional[str] = None
+    last_error: str | None = None
+    trace_id: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -371,7 +366,7 @@ def _record_retry_metrics(
     attempt: int,
     success: bool,
     duration: float,
-    error: Optional[Exception] = None,
+    error: Exception | None = None,
 ) -> None:
     """Record retry metrics."""
     record_tool_call(
@@ -391,8 +386,8 @@ def _record_retry_metrics(
 
 
 def retry_with_backoff(
-    policy: Union[RetryPolicy, RetryConfig] = RetryPolicy.DEFAULT,
-    operation_name: Optional[str] = None,
+    policy: RetryPolicy | RetryConfig = RetryPolicy.DEFAULT,
+    operation_name: str | None = None,
     reraise_permanent: bool = True,
 ) -> Callable[[F], F]:
     """Decorator to add retry logic with exponential backoff.
@@ -419,7 +414,7 @@ def retry_with_backoff(
         def wrapper(*args: Any, **kwargs: Any) -> Any:
             start_time = time.time()
             attempts = 0
-            last_error: Optional[Exception] = None
+            last_error: Exception | None = None
 
             # Build wait strategy with jitter
             wait_strategy = wait_exponential(

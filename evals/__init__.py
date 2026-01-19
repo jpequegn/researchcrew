@@ -4,8 +4,8 @@ Provides automated evaluation capabilities for research agent outputs.
 """
 
 from evals.metrics import (
-    CompletenessMetric,
     CoherenceMetric,
+    CompletenessMetric,
     FactualAccuracyMetric,
     ResearchQualityMetric,
     SourceQualityMetric,

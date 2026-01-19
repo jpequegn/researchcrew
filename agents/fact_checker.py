@@ -5,8 +5,8 @@ Validates claims against sources, knowledge base, and additional research.
 
 from google.adk import Agent
 
-from tools.search import web_search, read_url
 from tools.knowledge import knowledge_search
+from tools.search import read_url, web_search
 
 FACT_CHECKER_INSTRUCTIONS = """You are a fact-checking specialist who validates
 claims against their cited sources and the knowledge base.

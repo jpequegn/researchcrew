@@ -3,10 +3,9 @@
 Tests the runner's session integration for multi-turn conversations.
 """
 
-import pytest
 from runner import ResearchCrewRunner, run_research
-from utils.session_manager import reset_session_manager, get_session_manager
 from utils.context_manager import reset_context_manager
+from utils.session_manager import get_session_manager, reset_session_manager
 
 
 class TestResearchCrewRunner:
@@ -238,9 +237,7 @@ class TestMultiTurnConversation:
         )
 
         # Build follow-up prompt
-        follow_up = self.runner.build_prompt_with_context(
-            "Tell me more about Google ADK", session_id
-        )
+        follow_up = self.runner.build_prompt_with_context("Tell me more about Google ADK", session_id)
 
         # Should include context from previous turn
         assert "AI frameworks" in follow_up

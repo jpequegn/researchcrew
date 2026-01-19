@@ -3,18 +3,13 @@
 Tests the token counting, context compression, and sliding window functionality.
 """
 
-import pytest
-
 from utils.context_manager import (
-    ContextManager,
-    TokenCounter,
-    ContextCompressor,
-    ContextWindow,
-    ContextUsage,
-    ContextWarning,
-    CompressedContext,
-    ModelConfig,
     MODEL_CONFIGS,
+    ContextCompressor,
+    ContextManager,
+    ContextUsage,
+    ContextWindow,
+    TokenCounter,
     get_context_manager,
     reset_context_manager,
 )
@@ -394,8 +389,7 @@ class TestLongSessionSimulation:
         """Test that compression effectively reduces context size."""
         # Create a large history
         large_history = [
-            f"Turn {i}: Long detailed conversation about topic {i} with many words. " * 20
-            for i in range(30)
+            f"Turn {i}: Long detailed conversation about topic {i} with many words. " * 20 for i in range(30)
         ]
         many_facts = [f"Fact {i}: Important detail about the research." for i in range(100)]
 

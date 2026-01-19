@@ -4,11 +4,11 @@ Coordinates the research workflow and delegates tasks to specialized agents.
 Supports multi-turn conversations through session context injection.
 """
 
-from google.adk import Agent, SequentialAgent, ParallelAgent
+from google.adk import ParallelAgent, SequentialAgent
 
+from agents.fact_checker import fact_checker_agent
 from agents.researcher import researcher_agent
 from agents.synthesizer import synthesizer_agent
-from agents.fact_checker import fact_checker_agent
 from agents.writer import writer_agent
 
 ORCHESTRATOR_INSTRUCTIONS = """You are the research orchestrator who coordinates
@@ -59,9 +59,9 @@ research_phase = ParallelAgent(
 orchestrator_agent = SequentialAgent(
     name="research_orchestrator",
     agents=[
-        research_phase,     # Step 1: Parallel research
+        research_phase,  # Step 1: Parallel research
         synthesizer_agent,  # Step 2: Combine findings
-        fact_checker_agent, # Step 3: Validate claims
-        writer_agent,       # Step 4: Produce report
+        fact_checker_agent,  # Step 3: Validate claims
+        writer_agent,  # Step 4: Produce report
     ],
 )

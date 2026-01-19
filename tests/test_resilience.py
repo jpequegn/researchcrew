@@ -3,9 +3,9 @@
 Tests the retry logic and error classification for ResearchCrew.
 """
 
-import time
+from unittest.mock import Mock
+
 import pytest
-from unittest.mock import Mock, patch
 
 
 class TestErrorClassification:
@@ -13,7 +13,7 @@ class TestErrorClassification:
 
     def test_classify_timeout_error(self):
         """Test classification of timeout errors."""
-        from utils.resilience import classify_error, TransientError
+        from utils.resilience import TransientError, classify_error
 
         error = Exception("Connection timeout after 30s")
         classified = classify_error(error)
@@ -21,7 +21,7 @@ class TestErrorClassification:
 
     def test_classify_connection_error(self):
         """Test classification of connection errors."""
-        from utils.resilience import classify_error, NetworkError
+        from utils.resilience import NetworkError, classify_error
 
         error = Exception("Connection refused")
         classified = classify_error(error)
@@ -29,7 +29,7 @@ class TestErrorClassification:
 
     def test_classify_rate_limit_error(self):
         """Test classification of rate limit errors."""
-        from utils.resilience import classify_error, RateLimitError
+        from utils.resilience import RateLimitError, classify_error
 
         error = Exception("Rate limit exceeded, retry after 60s")
         classified = classify_error(error)
@@ -37,7 +37,7 @@ class TestErrorClassification:
 
     def test_classify_server_error(self):
         """Test classification of server errors (5xx)."""
-        from utils.resilience import classify_error, ServerError
+        from utils.resilience import ServerError, classify_error
 
         # Create mock HTTP error with status code
         error = Mock()
@@ -50,7 +50,7 @@ class TestErrorClassification:
 
     def test_classify_client_error(self):
         """Test classification of client errors (4xx)."""
-        from utils.resilience import classify_error, ClientError
+        from utils.resilience import ClientError, classify_error
 
         # Create mock HTTP error with status code
         error = Mock()
@@ -63,7 +63,7 @@ class TestErrorClassification:
 
     def test_classify_auth_error(self):
         """Test classification of authentication errors."""
-        from utils.resilience import classify_error, AuthenticationError
+        from utils.resilience import AuthenticationError, classify_error
 
         error = Exception("Unauthorized: invalid API key")
         classified = classify_error(error)
@@ -71,7 +71,7 @@ class TestErrorClassification:
 
     def test_classify_validation_error(self):
         """Test classification of validation errors."""
-        from utils.resilience import classify_error, ValidationError
+        from utils.resilience import ValidationError, classify_error
 
         error = Exception("Invalid input: required field missing")
         classified = classify_error(error)
@@ -79,7 +79,7 @@ class TestErrorClassification:
 
     def test_classify_already_classified(self):
         """Test that already classified errors are returned as-is."""
-        from utils.resilience import classify_error, TransientError, PermanentError
+        from utils.resilience import PermanentError, TransientError, classify_error
 
         transient = TransientError("Already transient")
         permanent = PermanentError("Already permanent")
@@ -89,7 +89,7 @@ class TestErrorClassification:
 
     def test_classify_unknown_error(self):
         """Test that unknown errors default to transient."""
-        from utils.resilience import classify_error, TransientError
+        from utils.resilience import TransientError, classify_error
 
         error = Exception("Some unknown error")
         classified = classify_error(error)
@@ -181,8 +181,8 @@ class TestRetryWithBackoff:
 
     def setup_method(self):
         """Reset state before each test."""
+        from utils import init_metrics, init_tracing, reset_metrics, reset_tracing
         from utils.resilience import clear_retry_stats
-        from utils import reset_tracing, init_tracing, reset_metrics, init_metrics
 
         clear_retry_stats()
         reset_tracing()
@@ -192,8 +192,8 @@ class TestRetryWithBackoff:
 
     def teardown_method(self):
         """Reset state after each test."""
+        from utils import reset_metrics, reset_tracing
         from utils.resilience import clear_retry_stats
-        from utils import reset_tracing, reset_metrics
 
         clear_retry_stats()
         reset_tracing()
@@ -201,7 +201,7 @@ class TestRetryWithBackoff:
 
     def test_success_no_retry(self):
         """Test successful call without retry."""
-        from utils.resilience import retry_with_backoff, RetryPolicy, get_retry_stats
+        from utils.resilience import RetryPolicy, get_retry_stats, retry_with_backoff
 
         call_count = 0
 
@@ -224,10 +224,10 @@ class TestRetryWithBackoff:
     def test_retry_on_transient_error(self):
         """Test retry on transient error."""
         from utils.resilience import (
-            retry_with_backoff,
             RetryConfig,
             TransientError,
             get_retry_stats,
+            retry_with_backoff,
         )
 
         call_count = 0
@@ -262,10 +262,10 @@ class TestRetryWithBackoff:
     def test_no_retry_on_permanent_error(self):
         """Test that permanent errors are not retried."""
         from utils.resilience import (
-            retry_with_backoff,
-            RetryConfig,
             PermanentError,
+            RetryConfig,
             get_retry_stats,
+            retry_with_backoff,
         )
 
         call_count = 0
@@ -297,10 +297,10 @@ class TestRetryWithBackoff:
     def test_exhausted_retries(self):
         """Test behavior when all retries are exhausted."""
         from utils.resilience import (
-            retry_with_backoff,
             RetryConfig,
             TransientError,
             get_retry_stats,
+            retry_with_backoff,
         )
 
         call_count = 0
@@ -332,9 +332,9 @@ class TestRetryWithBackoff:
     def test_custom_operation_name(self):
         """Test custom operation name in stats."""
         from utils.resilience import (
-            retry_with_backoff,
             RetryConfig,
             get_retry_stats,
+            retry_with_backoff,
         )
 
         fast_config = RetryConfig(
@@ -384,14 +384,14 @@ class TestIsRetriable:
 
     def test_transient_is_retriable(self):
         """Test that transient errors are retriable."""
-        from utils.resilience import is_retriable, TransientError
+        from utils.resilience import TransientError, is_retriable
 
         error = TransientError("Transient")
         assert is_retriable(error) is True
 
     def test_permanent_not_retriable(self):
         """Test that permanent errors are not retriable."""
-        from utils.resilience import is_retriable, PermanentError
+        from utils.resilience import PermanentError, is_retriable
 
         error = PermanentError("Permanent")
         assert is_retriable(error) is False
@@ -409,7 +409,7 @@ class TestGetRetryWait:
 
     def test_exponential_backoff(self):
         """Test exponential backoff calculation."""
-        from utils.resilience import get_retry_wait, RetryConfig, TransientError
+        from utils.resilience import RetryConfig, TransientError, get_retry_wait
 
         config = RetryConfig(
             max_attempts=3,
@@ -431,7 +431,7 @@ class TestGetRetryWait:
 
     def test_respects_max_wait(self):
         """Test that wait time respects max_wait."""
-        from utils.resilience import get_retry_wait, RetryConfig, TransientError
+        from utils.resilience import RetryConfig, TransientError, get_retry_wait
 
         config = RetryConfig(
             max_attempts=10,
@@ -448,7 +448,7 @@ class TestGetRetryWait:
 
     def test_uses_retry_after_header(self):
         """Test that retry_after from error is respected."""
-        from utils.resilience import get_retry_wait, RetryConfig, TransientError
+        from utils.resilience import RetryConfig, TransientError, get_retry_wait
 
         config = RetryConfig(
             max_attempts=3,
@@ -518,8 +518,8 @@ class TestClearRetryStats:
 
     def setup_method(self):
         """Reset state before each test."""
+        from utils import init_metrics, init_tracing, reset_metrics, reset_tracing
         from utils.resilience import clear_retry_stats
-        from utils import reset_tracing, init_tracing, reset_metrics, init_metrics
 
         clear_retry_stats()
         reset_tracing()
@@ -529,8 +529,8 @@ class TestClearRetryStats:
 
     def teardown_method(self):
         """Reset state after each test."""
+        from utils import reset_metrics, reset_tracing
         from utils.resilience import clear_retry_stats
-        from utils import reset_tracing, reset_metrics
 
         clear_retry_stats()
         reset_tracing()
@@ -539,10 +539,10 @@ class TestClearRetryStats:
     def test_clear_stats(self):
         """Test clearing retry stats."""
         from utils.resilience import (
-            retry_with_backoff,
             RetryConfig,
-            get_retry_stats,
             clear_retry_stats,
+            get_retry_stats,
+            retry_with_backoff,
         )
 
         fast_config = RetryConfig(
@@ -569,8 +569,8 @@ class TestIntegrationWithMetrics:
 
     def setup_method(self):
         """Reset state before each test."""
+        from utils import init_metrics, init_tracing, reset_metrics, reset_tracing
         from utils.resilience import clear_retry_stats
-        from utils import reset_tracing, init_tracing, reset_metrics, init_metrics
 
         clear_retry_stats()
         reset_tracing()
@@ -580,8 +580,8 @@ class TestIntegrationWithMetrics:
 
     def teardown_method(self):
         """Reset state after each test."""
+        from utils import reset_metrics, reset_tracing
         from utils.resilience import clear_retry_stats
-        from utils import reset_tracing, reset_metrics
 
         clear_retry_stats()
         reset_tracing()
@@ -589,12 +589,12 @@ class TestIntegrationWithMetrics:
 
     def test_retry_records_metrics(self):
         """Test that retries are recorded in metrics."""
+        from utils import get_metrics_text
         from utils.resilience import (
-            retry_with_backoff,
             RetryConfig,
             TransientError,
+            retry_with_backoff,
         )
-        from utils import get_metrics_text
 
         call_count = 0
 

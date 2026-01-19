@@ -8,7 +8,7 @@ import hashlib
 import logging
 import os
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 import chromadb
 from chromadb.config import Settings
@@ -22,11 +22,11 @@ class KnowledgeEntry(BaseModel):
 
     id: str = Field(description="Unique identifier for this entry")
     content: str = Field(description="The main content/finding")
-    source_url: Optional[str] = Field(default=None, description="Source URL if available")
-    source_title: Optional[str] = Field(default=None, description="Source title")
-    topic: Optional[str] = Field(default=None, description="Topic or category")
-    session_id: Optional[str] = Field(default=None, description="Session that created this")
-    confidence: Optional[str] = Field(default=None, description="Confidence level")
+    source_url: str | None = Field(default=None, description="Source URL if available")
+    source_title: str | None = Field(default=None, description="Source title")
+    topic: str | None = Field(default=None, description="Topic or category")
+    session_id: str | None = Field(default=None, description="Session that created this")
+    confidence: str | None = Field(default=None, description="Confidence level")
     created_at: str = Field(description="ISO timestamp when created")
 
 
@@ -53,7 +53,7 @@ class KnowledgeBaseManager:
 
     def __init__(
         self,
-        persist_directory: Optional[str] = None,
+        persist_directory: str | None = None,
         collection_name: str = "research_knowledge",
     ):
         """Initialize the knowledge base.
@@ -88,7 +88,7 @@ class KnowledgeBaseManager:
 
         logger.info(f"Collection '{collection_name}' ready with {self.collection.count()} entries")
 
-    def _generate_id(self, content: str, source_url: Optional[str] = None) -> str:
+    def _generate_id(self, content: str, source_url: str | None = None) -> str:
         """Generate a unique ID for content based on hash.
 
         Args:
@@ -103,7 +103,7 @@ class KnowledgeBaseManager:
             hash_input += source_url
         return hashlib.sha256(hash_input.encode()).hexdigest()[:16]
 
-    def _check_duplicate(self, content: str, threshold: float = 0.95) -> Optional[str]:
+    def _check_duplicate(self, content: str, threshold: float = 0.95) -> str | None:
         """Check if similar content already exists.
 
         Args:
@@ -139,13 +139,13 @@ class KnowledgeBaseManager:
     def add_entry(
         self,
         content: str,
-        source_url: Optional[str] = None,
-        source_title: Optional[str] = None,
-        topic: Optional[str] = None,
-        session_id: Optional[str] = None,
-        confidence: Optional[str] = None,
+        source_url: str | None = None,
+        source_title: str | None = None,
+        topic: str | None = None,
+        session_id: str | None = None,
+        confidence: str | None = None,
         skip_duplicates: bool = True,
-    ) -> Optional[KnowledgeEntry]:
+    ) -> KnowledgeEntry | None:
         """Add a new entry to the knowledge base.
 
         Args:
@@ -211,8 +211,8 @@ class KnowledgeBaseManager:
         self,
         query: str,
         n_results: int = 5,
-        topic_filter: Optional[str] = None,
-        min_confidence: Optional[str] = None,
+        topic_filter: str | None = None,
+        min_confidence: str | None = None,
     ) -> list[SearchResult]:
         """Search the knowledge base for relevant entries.
 
@@ -256,9 +256,7 @@ class KnowledgeBaseManager:
                 if min_confidence:
                     confidence_order = {"high": 3, "medium": 2, "low": 1}
                     entry_conf = metadata.get("confidence", "low")
-                    if confidence_order.get(entry_conf, 0) < confidence_order.get(
-                        min_confidence, 0
-                    ):
+                    if confidence_order.get(entry_conf, 0) < confidence_order.get(min_confidence, 0):
                         continue
 
                 entry = KnowledgeEntry(
@@ -283,7 +281,7 @@ class KnowledgeBaseManager:
         logger.debug(f"Search for '{query}' returned {len(search_results)} results")
         return search_results
 
-    def get_entry(self, entry_id: str) -> Optional[KnowledgeEntry]:
+    def get_entry(self, entry_id: str) -> KnowledgeEntry | None:
         """Get a specific entry by ID.
 
         Args:
@@ -391,11 +389,11 @@ class KnowledgeBaseManager:
 
 
 # Global instance management
-_knowledge_base: Optional[KnowledgeBaseManager] = None
+_knowledge_base: KnowledgeBaseManager | None = None
 
 
 def get_knowledge_base(
-    persist_directory: Optional[str] = None,
+    persist_directory: str | None = None,
 ) -> KnowledgeBaseManager:
     """Get the global knowledge base instance.
 

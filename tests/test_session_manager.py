@@ -3,11 +3,10 @@
 Tests the session management functionality for multi-turn conversations.
 """
 
-import pytest
 from utils.session_manager import (
+    ConversationTurn,
     SessionManager,
     SessionState,
-    ConversationTurn,
     get_session_manager,
     reset_session_manager,
 )
@@ -34,9 +33,7 @@ class TestSessionManager:
 
     def test_create_session_with_custom_id(self):
         """Test creating a session with a custom ID."""
-        session = self.manager.create_session(
-            user_id="test_user", session_id="custom-session-123"
-        )
+        session = self.manager.create_session(user_id="test_user", session_id="custom-session-123")
 
         assert session.session_id == "custom-session-123"
         assert session.user_id == "test_user"
@@ -57,9 +54,7 @@ class TestSessionManager:
 
     def test_get_or_create_session_creates_new(self):
         """Test get_or_create creates a new session when not found."""
-        session = self.manager.get_or_create_session(
-            session_id="new-session", user_id="test_user"
-        )
+        session = self.manager.get_or_create_session(session_id="new-session", user_id="test_user")
 
         assert session.session_id == "new-session"
         assert session.user_id == "test_user"

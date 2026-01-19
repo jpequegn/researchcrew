@@ -7,8 +7,6 @@ import os
 import shutil
 import tempfile
 
-import pytest
-
 from utils.knowledge_base import (
     KnowledgeBaseManager,
     KnowledgeEntry,
@@ -236,7 +234,7 @@ class TestGlobalKnowledgeBase:
         """Clean up after tests."""
         reset_knowledge_base()
         # Clean up test directory
-        if hasattr(self, 'test_dir') and os.path.exists(self.test_dir):
+        if hasattr(self, "test_dir") and os.path.exists(self.test_dir):
             shutil.rmtree(self.test_dir, ignore_errors=True)
         # Remove environment variable
         os.environ.pop("RESEARCHCREW_KNOWLEDGE_PATH", None)

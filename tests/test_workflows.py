@@ -3,12 +3,9 @@
 Tests end-to-end workflows and agent coordination.
 """
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
-
 from runner import ResearchCrewRunner, run_research
-from utils.session_manager import reset_session_manager, get_session_manager
 from utils.context_manager import reset_context_manager
+from utils.session_manager import get_session_manager, reset_session_manager
 
 
 class TestResearchWorkflow:
@@ -340,26 +337,31 @@ class TestAgentImports:
     def test_import_researcher(self):
         """Test researcher agent import."""
         from agents.researcher import researcher_agent
+
         assert researcher_agent is not None
 
     def test_import_synthesizer(self):
         """Test synthesizer agent import."""
         from agents.synthesizer import synthesizer_agent
+
         assert synthesizer_agent is not None
 
     def test_import_fact_checker(self):
         """Test fact checker agent import."""
         from agents.fact_checker import fact_checker_agent
+
         assert fact_checker_agent is not None
 
     def test_import_writer(self):
         """Test writer agent import."""
         from agents.writer import writer_agent
+
         assert writer_agent is not None
 
     def test_import_orchestrator(self):
         """Test orchestrator agent import."""
         from agents.orchestrator import orchestrator_agent
+
         assert orchestrator_agent is not None
 
 
@@ -368,12 +370,14 @@ class TestToolImports:
 
     def test_import_search_tools(self):
         """Test search tools import."""
-        from tools.search import web_search, read_url
+        from tools.search import read_url, web_search
+
         assert web_search is not None
         assert read_url is not None
 
     def test_import_knowledge_tools(self):
         """Test knowledge tools import."""
         from tools.knowledge import knowledge_search, save_to_knowledge
+
         assert knowledge_search is not None
         assert save_to_knowledge is not None

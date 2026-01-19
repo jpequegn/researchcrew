@@ -9,12 +9,10 @@ This file validates Issue #19 requirements:
 """
 
 import json
-import os
 from pathlib import Path
 
 import pytest
 import yaml
-
 
 # ============================================================================
 # Project Root and Paths
@@ -130,9 +128,7 @@ class TestConfigurationManagement:
             with open(config_file) as f:
                 config = yaml.safe_load(f)
 
-            assert config["environment"] == expected_env, (
-                f"{filename} should have environment={expected_env}"
-            )
+            assert config["environment"] == expected_env, f"{filename} should have environment={expected_env}"
 
     def test_prod_has_observability_enabled(self):
         """Verify production config has observability settings."""
@@ -201,9 +197,7 @@ class TestVertexAIDeployment:
             pytest.skip("Dockerfile not found")
 
         content = dockerfile.read_text()
-        assert "USER appuser" in content or "USER 1000" in content, (
-            "Dockerfile should run as non-root user"
-        )
+        assert "USER appuser" in content or "USER 1000" in content, "Dockerfile should run as non-root user"
 
     def test_deploy_script_exists(self):
         """Verify deployment script exists."""
@@ -219,9 +213,7 @@ class TestVertexAIDeployment:
         content = deploy_script.read_text()
         # Check for common deployment commands
         assert "docker build" in content, "Deploy script should include docker build"
-        assert "docker push" in content or "gcloud" in content, (
-            "Deploy script should include push command"
-        )
+        assert "docker push" in content or "gcloud" in content, "Deploy script should include push command"
 
     def test_deploy_config_exists(self):
         """Verify Vertex AI deployment config exists."""
@@ -368,9 +360,9 @@ class TestSecretsManagement:
 
         # This test passes if no actual .env files exist
         # (they would be in .gitignore anyway)
-        assert len(actual_env_files) == 0 or all(
-            f.name.endswith(".example") for f in actual_env_files
-        ), "No actual .env files should be committed (only .env.example is OK)"
+        assert len(actual_env_files) == 0 or all(f.name.endswith(".example") for f in actual_env_files), (
+            "No actual .env files should be committed (only .env.example is OK)"
+        )
 
     def test_deploy_config_uses_secret_references(self):
         """Verify deployment config uses secret references, not plaintext."""
@@ -406,9 +398,7 @@ class TestSecretsManagement:
 
                 # Check for common patterns of hardcoded secrets
                 # Note: We're checking for actual key values, not variable names
-                assert "AIza" not in content, (
-                    f"{py_file} may contain hardcoded Google API key"
-                )
+                assert "AIza" not in content, f"{py_file} may contain hardcoded Google API key"
                 assert "sk-" not in content or "sk-" in "# sk-" or "skip" in content, (
                     f"{py_file} may contain hardcoded OpenAI API key"
                 )
@@ -494,9 +484,9 @@ class TestCICDPipeline:
             workflow = yaml.safe_load(f)
 
         jobs = workflow.get("jobs", {})
-        assert "quality-gate" in jobs or any(
-            "gate" in job.lower() for job in jobs
-        ), "CI workflow should have quality gate job"
+        assert "quality-gate" in jobs or any("gate" in job.lower() for job in jobs), (
+            "CI workflow should have quality gate job"
+        )
 
     def test_ci_runs_on_pull_requests(self):
         """Verify CI runs on pull requests."""
@@ -546,9 +536,7 @@ class TestDeploymentDocumentation:
         assert len(content) > 500, "Deployment docs should have substantial content"
 
         # Check for key sections
-        assert "Vertex" in content or "vertex" in content, (
-            "Deployment docs should mention Vertex AI"
-        )
+        assert "Vertex" in content or "vertex" in content, "Deployment docs should mention Vertex AI"
 
     def test_mcp_servers_documented(self):
         """Verify MCP servers are documented."""
@@ -591,9 +579,7 @@ class TestDeploymentReadiness:
             if not full_path.exists():
                 missing_files.append(file_path)
 
-        assert len(missing_files) == 0, (
-            f"Missing required deployment files: {missing_files}"
-        )
+        assert len(missing_files) == 0, f"Missing required deployment files: {missing_files}"
 
     def test_docker_build_would_succeed(self):
         """Verify Dockerfile references valid paths."""

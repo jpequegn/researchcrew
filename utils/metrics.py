@@ -21,24 +21,24 @@ Usage:
 
 import logging
 import time
+from collections.abc import Callable, Generator
 from contextlib import contextmanager
-from typing import Any, Callable, Generator, Optional, TypeVar
+from typing import Any, Optional, TypeVar
 
 try:
     from prometheus_client import (
+        CollectorRegistry,
         Counter,
         Gauge,
         Histogram,
-        CollectorRegistry,
         generate_latest,
-        CONTENT_TYPE_LATEST,
     )
 
     PROMETHEUS_AVAILABLE = True
 except ImportError:
     PROMETHEUS_AVAILABLE = False
 
-from utils.tracing import get_trace_id, get_span_id
+from utils.tracing import get_trace_id
 
 logger = logging.getLogger(__name__)
 
@@ -219,12 +219,10 @@ def record_request_duration(
         duration = time.time() - ctx["start_time"]
 
         if _request_duration is not None:
-            _request_duration.labels(agent=agent, status=ctx["status"]).observe(
-                duration
-            )
+            _request_duration.labels(agent=agent, status=ctx["status"]).observe(duration)
 
         logger.debug(
-            f"Request completed",
+            "Request completed",
             extra={
                 "agent": agent,
                 "status": ctx["status"],
@@ -291,7 +289,7 @@ def record_token_usage(
 def record_error(
     agent: str,
     error_type: str = "unknown",
-    error_message: Optional[str] = None,
+    error_message: str | None = None,
 ) -> None:
     """Record an agent error.
 
@@ -328,7 +326,7 @@ def update_error_rate(agent: str, error_rate: float) -> None:
 def record_tool_call(
     tool: str,
     success: bool = True,
-    duration_seconds: Optional[float] = None,
+    duration_seconds: float | None = None,
 ) -> None:
     """Record a tool call.
 
@@ -402,7 +400,7 @@ def decrement_active_sessions() -> None:
         _active_sessions.dec()
 
 
-def metric_tool(tool_name: Optional[str] = None) -> Callable[[F], F]:
+def metric_tool(tool_name: str | None = None) -> Callable[[F], F]:
     """Decorator to automatically record metrics for tool calls.
 
     Args:
@@ -441,7 +439,7 @@ def metric_tool(tool_name: Optional[str] = None) -> Callable[[F], F]:
     return decorator
 
 
-def metric_agent(agent_name: Optional[str] = None) -> Callable[[F], F]:
+def metric_agent(agent_name: str | None = None) -> Callable[[F], F]:
     """Decorator to automatically record metrics for agent operations.
 
     Args:

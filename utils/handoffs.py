@@ -59,9 +59,7 @@ def log_handoff(
     # Extract key metrics from state for logging
     state_summary = _summarize_state(state)
 
-    logger.info(
-        f"[{timestamp}] HANDOFF: {from_agent} → {to_agent} | {state_summary}"
-    )
+    logger.info(f"[{timestamp}] HANDOFF: {from_agent} → {to_agent} | {state_summary}")
 
 
 def _summarize_state(state: BaseModel) -> str:
@@ -163,10 +161,7 @@ def create_session_aware_handoff(
     if session_id:
         session_info = f" | session={session_id}"
 
-    logger.info(
-        f"[{timestamp}] HANDOFF: {from_agent} → {to_agent} | "
-        f"{state_summary}{session_info}"
-    )
+    logger.info(f"[{timestamp}] HANDOFF: {from_agent} → {to_agent} | {state_summary}{session_info}")
 
     # If the state has session fields, ensure they're populated
     state_dict = state.model_dump()

@@ -6,24 +6,23 @@ Includes context window management to handle long research sessions.
 """
 
 import logging
-from typing import Any, Optional
+from typing import Any
 
-from utils.session_manager import (
-    SessionManager,
-    SessionState,
-    get_session_manager,
-)
 from utils.context_manager import (
     ContextManager,
     ContextUsage,
     ContextWarning,
     get_context_manager,
 )
+from utils.session_manager import (
+    SessionManager,
+    SessionState,
+    get_session_manager,
+)
 from utils.tracing import (
-    get_tracer,
-    trace_span,
     add_trace_context,
     get_trace_id,
+    trace_span,
 )
 
 logger = logging.getLogger(__name__)
@@ -42,8 +41,8 @@ class ResearchCrewRunner:
 
     def __init__(
         self,
-        session_manager: Optional[SessionManager] = None,
-        context_manager: Optional[ContextManager] = None,
+        session_manager: SessionManager | None = None,
+        context_manager: ContextManager | None = None,
         model_name: str = "gemini-2.0-flash",
     ):
         """Initialize the runner.
@@ -56,7 +55,7 @@ class ResearchCrewRunner:
         self.session_manager = session_manager or get_session_manager()
         self.context_manager = context_manager or get_context_manager(model_name)
         self._last_context_warnings: list[ContextWarning] = []
-        self._last_context_usage: Optional[ContextUsage] = None
+        self._last_context_usage: ContextUsage | None = None
         logger.info(f"ResearchCrewRunner initialized with model {model_name}")
 
     def create_session(self, user_id: str = "default_user") -> str:
@@ -71,7 +70,7 @@ class ResearchCrewRunner:
         session = self.session_manager.create_session(user_id=user_id)
         return session.session_id
 
-    def get_session(self, session_id: str) -> Optional[SessionState]:
+    def get_session(self, session_id: str) -> SessionState | None:
         """Get a session by ID.
 
         Args:
@@ -85,7 +84,7 @@ class ResearchCrewRunner:
     def build_prompt_with_context(
         self,
         query: str,
-        session_id: Optional[str] = None,
+        session_id: str | None = None,
         auto_compress: bool = True,
     ) -> str:
         """Build a prompt that includes session context with token management.
@@ -99,9 +98,7 @@ class ResearchCrewRunner:
             The augmented prompt with session context
         """
         if not session_id:
-            self._last_context_usage = self.context_manager.estimate_usage(
-                current_query=query
-            )
+            self._last_context_usage = self.context_manager.estimate_usage(current_query=query)
             self._last_context_warnings = []
             return query
 
@@ -136,13 +133,9 @@ If the query references previous findings, expand on them coherently."""
         # Log any warnings
         for warning in warnings:
             if warning.level == "critical":
-                logger.warning(
-                    f"Context critical: {warning.message} ({warning.usage_percent:.1%} used)"
-                )
+                logger.warning(f"Context critical: {warning.message} ({warning.usage_percent:.1%} used)")
             elif warning.level == "warning":
-                logger.info(
-                    f"Context warning: {warning.message} ({warning.usage_percent:.1%} used)"
-                )
+                logger.info(f"Context warning: {warning.message} ({warning.usage_percent:.1%} used)")
 
         # Augment the query with optimized context
         augmented_prompt = f"""
@@ -154,7 +147,7 @@ If the current query references previous findings (e.g., "tell me more about X",
 """
         return augmented_prompt.strip()
 
-    def get_context_usage(self) -> Optional[ContextUsage]:
+    def get_context_usage(self) -> ContextUsage | None:
         """Get the context usage from the last query.
 
         Returns:
@@ -188,12 +181,8 @@ If the current query references previous findings (e.g., "tell me more about X",
                 "query_tokens": usage.query_tokens,
                 "history_tokens": 0,
                 "facts_tokens": 0,
-                "remaining_tokens": self.context_manager.token_counter.get_remaining_tokens(
-                    usage.total_tokens
-                ),
-                "usage_percent": self.context_manager.token_counter.get_usage_percent(
-                    usage.total_tokens
-                ),
+                "remaining_tokens": self.context_manager.token_counter.get_remaining_tokens(usage.total_tokens),
+                "usage_percent": self.context_manager.token_counter.get_usage_percent(usage.total_tokens),
                 "warnings": [],
             }
 
@@ -216,12 +205,8 @@ If the current query references previous findings (e.g., "tell me more about X",
             "query_tokens": usage.query_tokens,
             "history_tokens": usage.history_tokens,
             "facts_tokens": usage.facts_tokens,
-            "remaining_tokens": self.context_manager.token_counter.get_remaining_tokens(
-                usage.total_tokens
-            ),
-            "usage_percent": self.context_manager.token_counter.get_usage_percent(
-                usage.total_tokens
-            ),
+            "remaining_tokens": self.context_manager.token_counter.get_remaining_tokens(usage.total_tokens),
+            "usage_percent": self.context_manager.token_counter.get_usage_percent(usage.total_tokens),
             "warnings": [warning.message] if warning else [],
         }
 
@@ -294,15 +279,12 @@ If the current query references previous findings (e.g., "tell me more about X",
             findings_summary=summary,
         )
 
-        logger.info(
-            f"Recorded result for session {session_id}: "
-            f"{findings_count} findings, {sources_count} sources"
-        )
+        logger.info(f"Recorded result for session {session_id}: {findings_count} findings, {sources_count} sources")
 
     async def run_async(
         self,
         query: str,
-        session_id: Optional[str] = None,
+        session_id: str | None = None,
         user_id: str = "default_user",
         auto_compress: bool = True,
     ) -> dict[str, Any]:
@@ -332,9 +314,7 @@ If the current query references previous findings (e.g., "tell me more about X",
             # Get or create session
             with trace_span("session.resolve") as session_span:
                 if session_id:
-                    session = self.session_manager.get_or_create_session(
-                        session_id=session_id, user_id=user_id
-                    )
+                    session = self.session_manager.get_or_create_session(session_id=session_id, user_id=user_id)
                     session_span.set_attribute("session.action", "retrieved")
                 else:
                     session = self.session_manager.create_session(user_id=user_id)
@@ -360,9 +340,7 @@ If the current query references previous findings (e.g., "tell me more about X",
 
             # Build prompt with context from previous turns (with token management)
             with trace_span("context.build") as context_span:
-                augmented_query = self.build_prompt_with_context(
-                    query, session_id, auto_compress=auto_compress
-                )
+                augmented_query = self.build_prompt_with_context(query, session_id, auto_compress=auto_compress)
                 context_span.set_attribute("context.augmented", augmented_query != query)
 
             # Get context info for result
@@ -374,10 +352,7 @@ If the current query references previous findings (e.g., "tell me more about X",
                     "history_tokens": usage.history_tokens,
                     "facts_tokens": usage.facts_tokens,
                     "query_tokens": usage.query_tokens,
-                    "warnings": [
-                        {"level": w.level, "message": w.message}
-                        for w in self._last_context_warnings
-                    ],
+                    "warnings": [{"level": w.level, "message": w.message} for w in self._last_context_warnings],
                 }
                 workflow_span.set_attribute("context.total_tokens", usage.total_tokens)
 
@@ -398,8 +373,7 @@ If the current query references previous findings (e.g., "tell me more about X",
                 "trace_id": trace_id,
                 "status": "pending_implementation",
                 "message": (
-                    "Session and context management ready. "
-                    "Agent execution integration pending ADK runner setup."
+                    "Session and context management ready. Agent execution integration pending ADK runner setup."
                 ),
             }
 
@@ -409,7 +383,7 @@ If the current query references previous findings (e.g., "tell me more about X",
     def run(
         self,
         query: str,
-        session_id: Optional[str] = None,
+        session_id: str | None = None,
         user_id: str = "default_user",
         auto_compress: bool = True,
     ) -> dict[str, Any]:
@@ -465,7 +439,7 @@ If the current query references previous findings (e.g., "tell me more about X",
 # Convenience function for quick usage
 def run_research(
     query: str,
-    session_id: Optional[str] = None,
+    session_id: str | None = None,
     user_id: str = "default_user",
 ) -> dict[str, Any]:
     """Run a research query with session support.

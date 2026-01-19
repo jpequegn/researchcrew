@@ -19,14 +19,13 @@ import pytest
 pytest.importorskip("deepeval", reason="deepeval not installed")
 
 from evals.metrics import (
-    CompletenessMetric,
     CoherenceMetric,
+    CompletenessMetric,
     FactualAccuracyMetric,
     SourceQualityMetric,
     load_golden_dataset,
 )
 from evals.run_evals import EvalRunner
-
 
 # ============================================================================
 # Golden Dataset Verification
@@ -65,9 +64,7 @@ class TestGoldenDatasetRequirements:
         """Verify all test cases have expected topics."""
         for tc in self.test_cases:
             assert "expected_topics" in tc, f"Test case {tc.get('id')} missing expected_topics"
-            assert isinstance(tc["expected_topics"], list), (
-                f"Test case {tc.get('id')} expected_topics should be a list"
-            )
+            assert isinstance(tc["expected_topics"], list), f"Test case {tc.get('id')} expected_topics should be a list"
 
     def test_all_test_cases_have_quality_metrics(self):
         """Verify all test cases have quality metrics defined."""
@@ -208,9 +205,7 @@ class TestQualityGates:
         expected_metrics = {"Source Quality", "Completeness", "Coherence", "Factual Accuracy"}
         actual_metrics = set(report.average_scores.keys())
 
-        assert expected_metrics == actual_metrics, (
-            f"Missing metrics: {expected_metrics - actual_metrics}"
-        )
+        assert expected_metrics == actual_metrics, f"Missing metrics: {expected_metrics - actual_metrics}"
 
     def test_report_includes_category_breakdown(self):
         """Verify report includes scores broken down by category."""
@@ -254,7 +249,7 @@ class TestBaselineAccuracy:
 
         assert "overall_pass_rate" in report
         assert report["overall_pass_rate"] >= 0.80, (
-            f"Baseline pass rate should be >= 80%, got {report['overall_pass_rate']*100:.1f}%"
+            f"Baseline pass rate should be >= 80%, got {report['overall_pass_rate'] * 100:.1f}%"
         )
 
     def test_baseline_factual_accuracy_above_target(self):
@@ -266,9 +261,7 @@ class TestBaselineAccuracy:
             report = json.load(f)
 
         factual = report.get("average_scores", {}).get("Factual Accuracy", 0)
-        assert factual >= 0.85, (
-            f"Factual Accuracy should be >= 85%, got {factual*100:.1f}%"
-        )
+        assert factual >= 0.85, f"Factual Accuracy should be >= 85%, got {factual * 100:.1f}%"
 
     def test_baseline_source_quality_above_target(self):
         """Verify baseline source quality meets target (>80%)."""
@@ -279,9 +272,7 @@ class TestBaselineAccuracy:
             report = json.load(f)
 
         source = report.get("average_scores", {}).get("Source Quality", 0)
-        assert source >= 0.80, (
-            f"Source Quality should be >= 80%, got {source*100:.1f}%"
-        )
+        assert source >= 0.80, f"Source Quality should be >= 80%, got {source * 100:.1f}%"
 
     def test_baseline_completeness_above_target(self):
         """Verify baseline completeness meets target (>75%)."""
@@ -292,9 +283,7 @@ class TestBaselineAccuracy:
             report = json.load(f)
 
         completeness = report.get("average_scores", {}).get("Completeness", 0)
-        assert completeness >= 0.75, (
-            f"Completeness should be >= 75%, got {completeness*100:.1f}%"
-        )
+        assert completeness >= 0.75, f"Completeness should be >= 75%, got {completeness * 100:.1f}%"
 
     def test_baseline_coherence_above_target(self):
         """Verify baseline coherence meets target (>80%)."""
@@ -305,9 +294,7 @@ class TestBaselineAccuracy:
             report = json.load(f)
 
         coherence = report.get("average_scores", {}).get("Coherence", 0)
-        assert coherence >= 0.80, (
-            f"Coherence should be >= 80%, got {coherence*100:.1f}%"
-        )
+        assert coherence >= 0.80, f"Coherence should be >= 80%, got {coherence * 100:.1f}%"
 
     def test_baseline_has_test_case_results(self):
         """Verify baseline has individual test case results."""
@@ -379,9 +366,7 @@ class TestRegressionPrevention:
 
         # Each category should have comparable metrics
         for category, scores in baseline["scores_by_category"].items():
-            assert "pass_rate" in scores, (
-                f"Category {category} should have pass_rate for regression detection"
-            )
+            assert "pass_rate" in scores, f"Category {category} should have pass_rate for regression detection"
 
 
 # ============================================================================

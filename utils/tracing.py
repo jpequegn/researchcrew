@@ -15,8 +15,9 @@ Usage:
 import functools
 import logging
 import os
+from collections.abc import Callable, Generator
 from contextlib import contextmanager
-from typing import Any, Callable, Generator, Optional, TypeVar
+from typing import Any, TypeVar
 
 from opentelemetry import trace
 from opentelemetry.sdk.resources import Resource
@@ -30,7 +31,7 @@ logger = logging.getLogger(__name__)
 F = TypeVar("F", bound=Callable[..., Any])
 
 # Global tracer provider
-_tracer_provider: Optional[TracerProvider] = None
+_tracer_provider: TracerProvider | None = None
 _initialized: bool = False
 
 # Service name and version
@@ -42,7 +43,7 @@ def init_tracing(
     service_name: str = SERVICE_NAME,
     service_version: str = SERVICE_VERSION,
     exporter_type: str = "console",
-    otlp_endpoint: Optional[str] = None,
+    otlp_endpoint: str | None = None,
 ) -> TracerProvider:
     """Initialize OpenTelemetry tracing.
 
@@ -80,9 +81,7 @@ def init_tracing(
 
     elif exporter_type == "otlp":
         if not otlp_endpoint:
-            otlp_endpoint = os.environ.get(
-                "OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317"
-            )
+            otlp_endpoint = os.environ.get("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317")
 
         try:
             from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import (
@@ -139,7 +138,7 @@ def reset_tracing() -> None:
 def trace_span(
     name: str,
     kind: SpanKind = SpanKind.INTERNAL,
-    attributes: Optional[dict[str, Any]] = None,
+    attributes: dict[str, Any] | None = None,
 ) -> Generator[Span, None, None]:
     """Context manager for creating a traced span.
 
@@ -180,7 +179,7 @@ def _sanitize_attribute(value: Any) -> Any:
 
 
 def trace_tool(
-    tool_name: Optional[str] = None,
+    tool_name: str | None = None,
     record_args: bool = True,
     record_result: bool = True,
 ) -> Callable[[F], F]:
@@ -244,7 +243,7 @@ def trace_tool(
 
 
 def trace_agent(
-    agent_name: Optional[str] = None,
+    agent_name: str | None = None,
     record_input: bool = True,
     record_output: bool = True,
 ) -> Callable[[F], F]:
@@ -305,9 +304,9 @@ def trace_agent(
 def trace_llm_call(
     model_name: str,
     prompt: str,
-    response: Optional[str] = None,
-    token_count: Optional[int] = None,
-    error: Optional[Exception] = None,
+    response: str | None = None,
+    token_count: int | None = None,
+    error: Exception | None = None,
 ) -> None:
     """Record an LLM call as a span event on the current span.
 
@@ -346,10 +345,10 @@ def trace_llm_call(
 
 
 def add_trace_context(
-    query: Optional[str] = None,
-    session_id: Optional[str] = None,
-    user_id: Optional[str] = None,
-    turn_number: Optional[int] = None,
+    query: str | None = None,
+    session_id: str | None = None,
+    user_id: str | None = None,
+    turn_number: int | None = None,
 ) -> None:
     """Add research context to the current span.
 
@@ -373,7 +372,7 @@ def add_trace_context(
         current_span.set_attribute("research.turn_number", turn_number)
 
 
-def get_trace_id() -> Optional[str]:
+def get_trace_id() -> str | None:
     """Get the current trace ID as a hex string.
 
     Returns:
@@ -386,7 +385,7 @@ def get_trace_id() -> Optional[str]:
     return None
 
 
-def get_span_id() -> Optional[str]:
+def get_span_id() -> str | None:
     """Get the current span ID as a hex string.
 
     Returns:

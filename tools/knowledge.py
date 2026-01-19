@@ -3,12 +3,10 @@
 Tools for agents to search and store research findings in the long-term knowledge base.
 """
 
-import json
 import logging
-from typing import Optional
 
-from utils.knowledge_base import get_knowledge_base, SearchResult
-from utils.tracing import trace_span, get_trace_id
+from utils.knowledge_base import get_knowledge_base
+from utils.tracing import get_trace_id, trace_span
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +14,7 @@ logger = logging.getLogger(__name__)
 def knowledge_search(
     query: str,
     max_results: int = 5,
-    topic: Optional[str] = None,
+    topic: str | None = None,
 ) -> str:
     """Search the knowledge base for previously researched information.
 
@@ -96,9 +94,9 @@ def knowledge_search(
 
 def save_to_knowledge(
     content: str,
-    source_url: Optional[str] = None,
-    source_title: Optional[str] = None,
-    topic: Optional[str] = None,
+    source_url: str | None = None,
+    source_title: str | None = None,
+    topic: str | None = None,
     confidence: str = "medium",
 ) -> str:
     """Save research findings to the long-term knowledge base.
@@ -203,9 +201,7 @@ def list_knowledge_topics() -> str:
             return "The knowledge base is empty - no topics have been researched yet."
 
         stats = kb.get_stats()
-        output_lines = [
-            f"Knowledge base contains {stats['total_entries']} entries across {len(topics)} topics:\n"
-        ]
+        output_lines = [f"Knowledge base contains {stats['total_entries']} entries across {len(topics)} topics:\n"]
 
         for topic in topics:
             count = stats["topics"].get(topic, 0)

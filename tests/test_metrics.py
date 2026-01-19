@@ -4,8 +4,8 @@ Tests the metrics module for ResearchCrew.
 """
 
 import time
+
 import pytest
-from unittest.mock import Mock, patch
 
 
 class TestMetricsInitialization:
@@ -25,19 +25,19 @@ class TestMetricsInitialization:
 
     def test_init_metrics(self):
         """Test metrics initialization."""
-        from utils.metrics import init_metrics, get_registry
+        from utils.metrics import get_registry, init_metrics
 
         init_metrics()
         assert get_registry() is not None
 
     def test_init_metrics_idempotent(self):
         """Test that multiple init calls don't cause errors."""
-        from utils.metrics import init_metrics, get_registry
+        from utils.metrics import get_registry, init_metrics
 
         init_metrics()
-        registry1 = get_registry()
+        get_registry()
         init_metrics()  # Should not create new metrics
-        registry2 = get_registry()
+        get_registry()
         # Registry may be same or different, but no error should occur
 
 
@@ -46,7 +46,7 @@ class TestRequestDurationMetrics:
 
     def setup_method(self):
         """Reset metrics before each test."""
-        from utils.metrics import reset_metrics, init_metrics
+        from utils.metrics import init_metrics, reset_metrics
 
         reset_metrics()
         init_metrics()
@@ -72,7 +72,7 @@ class TestRequestDurationMetrics:
         from utils.metrics import record_request_duration
 
         with pytest.raises(ValueError):
-            with record_request_duration("test_agent") as ctx:
+            with record_request_duration("test_agent"):
                 raise ValueError("Test error")
 
     def test_record_request_duration_auto_error_status(self):
@@ -95,7 +95,7 @@ class TestTokenUsageMetrics:
 
     def setup_method(self):
         """Reset metrics before each test."""
-        from utils.metrics import reset_metrics, init_metrics
+        from utils.metrics import init_metrics, reset_metrics
 
         reset_metrics()
         init_metrics()
@@ -110,9 +110,7 @@ class TestTokenUsageMetrics:
         """Test basic token usage recording."""
         from utils.metrics import record_token_usage
 
-        result = record_token_usage(
-            "researcher", input_tokens=1000, output_tokens=500
-        )
+        result = record_token_usage("researcher", input_tokens=1000, output_tokens=500)
 
         assert result["input_tokens"] == 1000
         assert result["output_tokens"] == 500
@@ -140,7 +138,7 @@ class TestErrorMetrics:
 
     def setup_method(self):
         """Reset metrics before each test."""
-        from utils.metrics import reset_metrics, init_metrics
+        from utils.metrics import init_metrics, reset_metrics
 
         reset_metrics()
         init_metrics()
@@ -179,7 +177,7 @@ class TestToolMetrics:
 
     def setup_method(self):
         """Reset metrics before each test."""
-        from utils.metrics import reset_metrics, init_metrics
+        from utils.metrics import init_metrics, reset_metrics
 
         reset_metrics()
         init_metrics()
@@ -217,7 +215,7 @@ class TestKnowledgeMetrics:
 
     def setup_method(self):
         """Reset metrics before each test."""
-        from utils.metrics import reset_metrics, init_metrics
+        from utils.metrics import init_metrics, reset_metrics
 
         reset_metrics()
         init_metrics()
@@ -242,7 +240,7 @@ class TestSessionMetrics:
 
     def setup_method(self):
         """Reset metrics before each test."""
-        from utils.metrics import reset_metrics, init_metrics
+        from utils.metrics import init_metrics, reset_metrics
 
         reset_metrics()
         init_metrics()
@@ -262,7 +260,7 @@ class TestSessionMetrics:
 
     def test_increment_decrement_sessions(self):
         """Test incrementing and decrementing sessions."""
-        from utils.metrics import increment_active_sessions, decrement_active_sessions
+        from utils.metrics import decrement_active_sessions, increment_active_sessions
 
         increment_active_sessions()
         increment_active_sessions()
@@ -275,7 +273,7 @@ class TestMetricsOutput:
 
     def setup_method(self):
         """Reset metrics before each test."""
-        from utils.metrics import reset_metrics, init_metrics
+        from utils.metrics import init_metrics, reset_metrics
 
         reset_metrics()
         init_metrics()
@@ -304,7 +302,7 @@ class TestMetricDecorators:
 
     def setup_method(self):
         """Reset metrics before each test."""
-        from utils.metrics import reset_metrics, init_metrics
+        from utils.metrics import init_metrics, reset_metrics
 
         reset_metrics()
         init_metrics()
@@ -371,10 +369,10 @@ class TestMetricsWithoutPrometheus:
 
         # These should all work without raising
         from utils.metrics import (
-            record_tool_call,
-            record_token_usage,
-            record_error,
             get_metrics_text,
+            record_error,
+            record_token_usage,
+            record_tool_call,
         )
 
         record_tool_call("test", success=True)

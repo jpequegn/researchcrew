@@ -4,8 +4,9 @@ Tests the circuit breaker module for ResearchCrew.
 """
 
 import time
+from datetime import UTC
+
 import pytest
-from unittest.mock import Mock
 
 
 class TestCircuitBreakerStates:
@@ -13,8 +14,8 @@ class TestCircuitBreakerStates:
 
     def setup_method(self):
         """Reset circuit breakers before each test."""
+        from utils import init_metrics, init_tracing, reset_metrics, reset_tracing
         from utils.circuit_breaker import clear_circuit_breakers
-        from utils import reset_tracing, init_tracing, reset_metrics, init_metrics
 
         clear_circuit_breakers()
         reset_tracing()
@@ -24,8 +25,8 @@ class TestCircuitBreakerStates:
 
     def teardown_method(self):
         """Clean up after each test."""
+        from utils import reset_metrics, reset_tracing
         from utils.circuit_breaker import clear_circuit_breakers
-        from utils import reset_tracing, reset_metrics
 
         clear_circuit_breakers()
         reset_tracing()
@@ -42,8 +43,8 @@ class TestCircuitBreakerStates:
         """Test circuit opens after failure threshold."""
         from utils.circuit_breaker import (
             CircuitBreaker,
-            CircuitState,
             CircuitBreakerConfig,
+            CircuitState,
         )
 
         config = CircuitBreakerConfig(
@@ -65,9 +66,9 @@ class TestCircuitBreakerStates:
         """Test that open circuit rejects calls."""
         from utils.circuit_breaker import (
             CircuitBreaker,
-            CircuitState,
             CircuitBreakerConfig,
             CircuitOpenError,
+            CircuitState,
         )
 
         config = CircuitBreakerConfig(
@@ -93,8 +94,8 @@ class TestCircuitBreakerStates:
         """Test circuit transitions to half-open after recovery timeout."""
         from utils.circuit_breaker import (
             CircuitBreaker,
-            CircuitState,
             CircuitBreakerConfig,
+            CircuitState,
         )
 
         config = CircuitBreakerConfig(
@@ -122,8 +123,8 @@ class TestCircuitBreakerStates:
         """Test circuit closes after success threshold in half-open."""
         from utils.circuit_breaker import (
             CircuitBreaker,
-            CircuitState,
             CircuitBreakerConfig,
+            CircuitState,
         )
 
         config = CircuitBreakerConfig(
@@ -154,8 +155,8 @@ class TestCircuitBreakerStates:
         """Test circuit reopens on failure in half-open state."""
         from utils.circuit_breaker import (
             CircuitBreaker,
-            CircuitState,
             CircuitBreakerConfig,
+            CircuitState,
         )
 
         config = CircuitBreakerConfig(
@@ -229,8 +230,8 @@ class TestCircuitBreakerFallback:
 
     def setup_method(self):
         """Reset circuit breakers before each test."""
+        from utils import init_metrics, init_tracing, reset_metrics, reset_tracing
         from utils.circuit_breaker import clear_circuit_breakers
-        from utils import reset_tracing, init_tracing, reset_metrics, init_metrics
 
         clear_circuit_breakers()
         reset_tracing()
@@ -240,8 +241,8 @@ class TestCircuitBreakerFallback:
 
     def teardown_method(self):
         """Clean up after each test."""
+        from utils import reset_metrics, reset_tracing
         from utils.circuit_breaker import clear_circuit_breakers
-        from utils import reset_tracing, reset_metrics
 
         clear_circuit_breakers()
         reset_tracing()
@@ -304,8 +305,8 @@ class TestCircuitBreakerStats:
 
     def setup_method(self):
         """Reset circuit breakers before each test."""
+        from utils import init_metrics, init_tracing, reset_metrics, reset_tracing
         from utils.circuit_breaker import clear_circuit_breakers
-        from utils import reset_tracing, init_tracing, reset_metrics, init_metrics
 
         clear_circuit_breakers()
         reset_tracing()
@@ -315,8 +316,8 @@ class TestCircuitBreakerStats:
 
     def teardown_method(self):
         """Clean up after each test."""
+        from utils import reset_metrics, reset_tracing
         from utils.circuit_breaker import clear_circuit_breakers
-        from utils import reset_tracing, reset_metrics
 
         clear_circuit_breakers()
         reset_tracing()
@@ -344,8 +345,9 @@ class TestCircuitBreakerStats:
 
     def test_stats_to_dict(self):
         """Test stats serialization."""
+        from datetime import datetime
+
         from utils.circuit_breaker import CircuitBreakerStats, CircuitState
-        from datetime import datetime, timezone
 
         stats = CircuitBreakerStats(
             name="test",
@@ -355,8 +357,8 @@ class TestCircuitBreakerStats:
             total_calls=10,
             total_failures=3,
             total_trips=1,
-            last_failure_time=datetime.now(timezone.utc),
-            last_state_change=datetime.now(timezone.utc),
+            last_failure_time=datetime.now(UTC),
+            last_state_change=datetime.now(UTC),
         )
 
         d = stats.to_dict()
@@ -402,8 +404,8 @@ class TestCircuitBreakerRegistry:
 
     def setup_method(self):
         """Reset circuit breakers before each test."""
+        from utils import init_metrics, init_tracing, reset_metrics, reset_tracing
         from utils.circuit_breaker import clear_circuit_breakers
-        from utils import reset_tracing, init_tracing, reset_metrics, init_metrics
 
         clear_circuit_breakers()
         reset_tracing()
@@ -413,8 +415,8 @@ class TestCircuitBreakerRegistry:
 
     def teardown_method(self):
         """Clean up after each test."""
+        from utils import reset_metrics, reset_tracing
         from utils.circuit_breaker import clear_circuit_breakers
-        from utils import reset_tracing, reset_metrics
 
         clear_circuit_breakers()
         reset_tracing()
@@ -431,7 +433,7 @@ class TestCircuitBreakerRegistry:
 
     def test_get_with_preset(self):
         """Test get_circuit_breaker with preset."""
-        from utils.circuit_breaker import get_circuit_breaker, CircuitBreakerPreset
+        from utils.circuit_breaker import CircuitBreakerPreset, get_circuit_breaker
 
         cb = get_circuit_breaker("test", preset=CircuitBreakerPreset.LLM_CALL)
         assert cb.config.failure_threshold == 3
@@ -439,10 +441,10 @@ class TestCircuitBreakerRegistry:
     def test_reset_single_circuit(self):
         """Test resetting a single circuit breaker."""
         from utils.circuit_breaker import (
-            get_circuit_breaker,
-            reset_circuit_breaker,
             CircuitBreakerConfig,
             CircuitState,
+            get_circuit_breaker,
+            reset_circuit_breaker,
         )
 
         config = CircuitBreakerConfig(failure_threshold=2)
@@ -464,10 +466,10 @@ class TestCircuitBreakerRegistry:
     def test_reset_all_circuits(self):
         """Test resetting all circuit breakers."""
         from utils.circuit_breaker import (
-            get_circuit_breaker,
-            reset_all_circuit_breakers,
             CircuitBreakerConfig,
             CircuitState,
+            get_circuit_breaker,
+            reset_all_circuit_breakers,
         )
 
         config = CircuitBreakerConfig(failure_threshold=1)
@@ -492,7 +494,7 @@ class TestCircuitBreakerRegistry:
 
     def test_get_all_stats(self):
         """Test getting stats for all circuits."""
-        from utils.circuit_breaker import get_circuit_breaker, get_all_circuit_stats
+        from utils.circuit_breaker import get_all_circuit_stats, get_circuit_breaker
 
         get_circuit_breaker("test1")
         get_circuit_breaker("test2")
@@ -507,8 +509,8 @@ class TestCircuitBreakerDecorator:
 
     def setup_method(self):
         """Reset circuit breakers before each test."""
+        from utils import init_metrics, init_tracing, reset_metrics, reset_tracing
         from utils.circuit_breaker import clear_circuit_breakers
-        from utils import reset_tracing, init_tracing, reset_metrics, init_metrics
 
         clear_circuit_breakers()
         reset_tracing()
@@ -518,8 +520,8 @@ class TestCircuitBreakerDecorator:
 
     def teardown_method(self):
         """Clean up after each test."""
+        from utils import reset_metrics, reset_tracing
         from utils.circuit_breaker import clear_circuit_breakers
-        from utils import reset_tracing, reset_metrics
 
         clear_circuit_breakers()
         reset_tracing()
@@ -539,10 +541,10 @@ class TestCircuitBreakerDecorator:
     def test_decorator_with_failure(self):
         """Test decorator with failing function."""
         from utils.circuit_breaker import (
+            CircuitBreakerConfig,
+            CircuitState,
             circuit_breaker_call,
             get_circuit_breaker,
-            CircuitState,
-            CircuitBreakerConfig,
         )
 
         config = CircuitBreakerConfig(failure_threshold=2)
@@ -567,8 +569,8 @@ class TestCircuitBreakerMonitoring:
 
     def setup_method(self):
         """Reset circuit breakers before each test."""
+        from utils import init_metrics, init_tracing, reset_metrics, reset_tracing
         from utils.circuit_breaker import clear_circuit_breakers
-        from utils import reset_tracing, init_tracing, reset_metrics, init_metrics
 
         clear_circuit_breakers()
         reset_tracing()
@@ -578,8 +580,8 @@ class TestCircuitBreakerMonitoring:
 
     def teardown_method(self):
         """Clean up after each test."""
+        from utils import reset_metrics, reset_tracing
         from utils.circuit_breaker import clear_circuit_breakers
-        from utils import reset_tracing, reset_metrics
 
         clear_circuit_breakers()
         reset_tracing()
@@ -602,9 +604,9 @@ class TestCircuitBreakerMonitoring:
     def test_get_status_unhealthy(self):
         """Test status when circuits are open."""
         from utils.circuit_breaker import (
+            CircuitBreakerConfig,
             get_circuit_breaker,
             get_circuit_breaker_status,
-            CircuitBreakerConfig,
         )
 
         config = CircuitBreakerConfig(failure_threshold=1)
@@ -622,9 +624,9 @@ class TestCircuitBreakerMonitoring:
     def test_is_service_healthy(self):
         """Test is_service_healthy helper."""
         from utils.circuit_breaker import (
+            CircuitBreakerConfig,
             get_circuit_breaker,
             is_service_healthy,
-            CircuitBreakerConfig,
         )
 
         # Non-existent circuit is considered healthy
@@ -649,8 +651,8 @@ class TestCircuitBreakerReset:
 
     def setup_method(self):
         """Reset circuit breakers before each test."""
+        from utils import init_metrics, init_tracing, reset_metrics, reset_tracing
         from utils.circuit_breaker import clear_circuit_breakers
-        from utils import reset_tracing, init_tracing, reset_metrics, init_metrics
 
         clear_circuit_breakers()
         reset_tracing()
@@ -660,8 +662,8 @@ class TestCircuitBreakerReset:
 
     def teardown_method(self):
         """Clean up after each test."""
+        from utils import reset_metrics, reset_tracing
         from utils.circuit_breaker import clear_circuit_breakers
-        from utils import reset_tracing, reset_metrics
 
         clear_circuit_breakers()
         reset_tracing()
@@ -671,8 +673,8 @@ class TestCircuitBreakerReset:
         """Test manually resetting a circuit."""
         from utils.circuit_breaker import (
             CircuitBreaker,
-            CircuitState,
             CircuitBreakerConfig,
+            CircuitState,
         )
 
         config = CircuitBreakerConfig(failure_threshold=2)
@@ -706,8 +708,8 @@ class TestCircuitBreakerStateChange:
 
     def setup_method(self):
         """Reset circuit breakers before each test."""
+        from utils import init_metrics, init_tracing, reset_metrics, reset_tracing
         from utils.circuit_breaker import clear_circuit_breakers
-        from utils import reset_tracing, init_tracing, reset_metrics, init_metrics
 
         clear_circuit_breakers()
         reset_tracing()
@@ -717,8 +719,8 @@ class TestCircuitBreakerStateChange:
 
     def teardown_method(self):
         """Clean up after each test."""
+        from utils import reset_metrics, reset_tracing
         from utils.circuit_breaker import clear_circuit_breakers
-        from utils import reset_tracing, reset_metrics
 
         clear_circuit_breakers()
         reset_tracing()
@@ -728,8 +730,8 @@ class TestCircuitBreakerStateChange:
         """Test state change callback is called."""
         from utils.circuit_breaker import (
             CircuitBreaker,
-            CircuitState,
             CircuitBreakerConfig,
+            CircuitState,
         )
 
         state_changes = []

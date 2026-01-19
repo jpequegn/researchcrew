@@ -20,18 +20,16 @@ Usage:
 """
 
 import asyncio
+from collections.abc import Callable
 from functools import wraps
-from typing import Any, Callable, Optional, TypeVar, Union
+from typing import Any, TypeVar
 
 from integrations.base import (
     AdapterConfig,
-    AdapterResult,
-    AdapterError,
     ExternalAgentAdapter,
     register_adapter,
 )
 from utils.logging_config import get_logger
-from utils.tracing import trace_span
 
 logger = get_logger(__name__)
 
@@ -54,7 +52,7 @@ class LangGraphToADKAdapter(ExternalAgentAdapter[dict[str, Any], dict[str, Any]]
         self,
         name: str,
         langgraph_runnable: Any,
-        config: Optional[AdapterConfig] = None,
+        config: AdapterConfig | None = None,
         input_key: str = "input",
         output_key: str = "output",
     ):
@@ -208,7 +206,7 @@ class ADKToLangGraphAdapter(ExternalAgentAdapter[dict[str, Any], dict[str, Any]]
         self,
         name: str,
         adk_agent: Any,
-        config: Optional[AdapterConfig] = None,
+        config: AdapterConfig | None = None,
         state_key: str = "query",
         result_key: str = "result",
     ):
@@ -277,7 +275,7 @@ class ADKToLangGraphAdapter(ExternalAgentAdapter[dict[str, Any], dict[str, Any]]
 
 def adk_to_langgraph_node(
     adk_agent: Any,
-    name: Optional[str] = None,
+    name: str | None = None,
     state_key: str = "query",
     result_key: str = "result",
     timeout: float = 120.0,
@@ -380,6 +378,7 @@ class LangGraphAdapter:
         Returns:
             The wrapped tool function.
         """
+
         # Create decorated function
         @langgraph_to_adk_tool(tool_name, description, **kwargs)
         async def tool_wrapper(state: dict) -> dict:
@@ -401,7 +400,7 @@ class LangGraphAdapter:
     def register_node(
         self,
         adk_agent: Any,
-        node_name: Optional[str] = None,
+        node_name: str | None = None,
         **kwargs,
     ) -> Callable:
         """Register an ADK agent as a LangGraph node.
@@ -420,11 +419,11 @@ class LangGraphAdapter:
         logger.info(f"Registered ADK node: {name}")
         return node
 
-    def get_tool(self, name: str) -> Optional[Callable]:
+    def get_tool(self, name: str) -> Callable | None:
         """Get a registered tool."""
         return self._tools.get(name)
 
-    def get_node(self, name: str) -> Optional[Callable]:
+    def get_node(self, name: str) -> Callable | None:
         """Get a registered node."""
         return self._nodes.get(name)
 

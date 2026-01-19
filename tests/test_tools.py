@@ -3,16 +3,15 @@
 Tests search and knowledge base tools with mocked external dependencies.
 """
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 
-from tools.search import web_search, read_url
 from tools.knowledge import (
-    knowledge_search,
-    save_to_knowledge,
-    list_knowledge_topics,
     get_knowledge_stats,
+    knowledge_search,
+    list_knowledge_topics,
+    save_to_knowledge,
 )
+from tools.search import read_url, web_search
 
 
 class TestWebSearch:

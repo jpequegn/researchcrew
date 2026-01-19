@@ -28,11 +28,12 @@ import hashlib
 import threading
 import time
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from functools import wraps
-from typing import Any, Callable, Generic, Optional, TypeVar
+from typing import Any, Generic, TypeVar
 
 from utils.logging_config import get_logger
 from utils.metrics import record_error
@@ -59,7 +60,7 @@ class FallbackExhaustedError(Exception):
     def __init__(
         self,
         message: str = "All fallback strategies exhausted",
-        last_error: Optional[Exception] = None,
+        last_error: Exception | None = None,
         attempts: int = 0,
     ):
         super().__init__(message)
@@ -74,9 +75,9 @@ class FallbackResult(Generic[T]):
     value: T
     strategy_name: str
     is_degraded: bool
-    degradation_message: Optional[str] = None
+    degradation_message: str | None = None
     execution_time: float = 0.0
-    fallback_reason: Optional[FallbackReason] = None
+    fallback_reason: FallbackReason | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -84,9 +85,7 @@ class FallbackResult(Generic[T]):
             "is_degraded": self.is_degraded,
             "degradation_message": self.degradation_message,
             "execution_time": self.execution_time,
-            "fallback_reason": (
-                self.fallback_reason.value if self.fallback_reason else None
-            ),
+            "fallback_reason": (self.fallback_reason.value if self.fallback_reason else None),
         }
 
 
@@ -100,8 +99,8 @@ class FallbackStats:
     fallback_uses: int = 0
     exhausted_count: int = 0
     strategy_uses: dict[str, int] = field(default_factory=dict)
-    last_fallback_time: Optional[datetime] = None
-    last_exhausted_time: Optional[datetime] = None
+    last_fallback_time: datetime | None = None
+    last_exhausted_time: datetime | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -110,18 +109,10 @@ class FallbackStats:
             "primary_successes": self.primary_successes,
             "fallback_uses": self.fallback_uses,
             "exhausted_count": self.exhausted_count,
-            "fallback_rate": (
-                self.fallback_uses / self.total_calls if self.total_calls > 0 else 0
-            ),
+            "fallback_rate": (self.fallback_uses / self.total_calls if self.total_calls > 0 else 0),
             "strategy_uses": self.strategy_uses,
-            "last_fallback_time": (
-                self.last_fallback_time.isoformat() if self.last_fallback_time else None
-            ),
-            "last_exhausted_time": (
-                self.last_exhausted_time.isoformat()
-                if self.last_exhausted_time
-                else None
-            ),
+            "last_fallback_time": (self.last_fallback_time.isoformat() if self.last_fallback_time else None),
+            "last_exhausted_time": (self.last_exhausted_time.isoformat() if self.last_exhausted_time else None),
         }
 
 
@@ -137,10 +128,10 @@ class FallbackStrategy(ABC, Generic[T]):
         """
         self.name = name
         self.is_degraded = is_degraded
-        self._degradation_message: Optional[str] = None
+        self._degradation_message: str | None = None
 
     @property
-    def degradation_message(self) -> Optional[str]:
+    def degradation_message(self) -> str | None:
         """Message explaining degraded functionality."""
         return self._degradation_message
 
@@ -186,8 +177,8 @@ class FallbackChain(Generic[T]):
         self,
         name: str,
         strategies: list[FallbackStrategy[T]],
-        on_fallback: Optional[Callable[[str, str, Exception], None]] = None,
-        on_exhausted: Optional[Callable[[Exception], None]] = None,
+        on_fallback: Callable[[str, str, Exception], None] | None = None,
+        on_exhausted: Callable[[Exception], None] | None = None,
     ):
         """Initialize fallback chain.
 
@@ -229,8 +220,8 @@ class FallbackChain(Generic[T]):
             },
         ) as span:
             start_time = time.time()
-            last_error: Optional[Exception] = None
-            fallback_reason: Optional[FallbackReason] = None
+            last_error: Exception | None = None
+            fallback_reason: FallbackReason | None = None
             attempts = 0
 
             with self._lock:
@@ -239,9 +230,7 @@ class FallbackChain(Generic[T]):
             for i, strategy in enumerate(self.strategies):
                 # Check if strategy can handle this request
                 if not strategy.can_handle(*args, **kwargs):
-                    logger.debug(
-                        f"Strategy '{strategy.name}' cannot handle request, skipping"
-                    )
+                    logger.debug(f"Strategy '{strategy.name}' cannot handle request, skipping")
                     continue
 
                 attempts += 1
@@ -265,9 +254,7 @@ class FallbackChain(Generic[T]):
                                 self._stats.primary_successes += 1
                             else:
                                 self._stats.fallback_uses += 1
-                                self._stats.last_fallback_time = datetime.now(
-                                    timezone.utc
-                                )
+                                self._stats.last_fallback_time = datetime.now(UTC)
 
                             self._stats.strategy_uses[strategy.name] = (
                                 self._stats.strategy_uses.get(strategy.name, 0) + 1
@@ -282,9 +269,7 @@ class FallbackChain(Generic[T]):
                                     "strategy": strategy.name,
                                     "strategy_index": i,
                                     "is_degraded": strategy.is_degraded,
-                                    "reason": (
-                                        fallback_reason.value if fallback_reason else None
-                                    ),
+                                    "reason": (fallback_reason.value if fallback_reason else None),
                                     "trace_id": get_trace_id(),
                                 },
                             )
@@ -329,7 +314,7 @@ class FallbackChain(Generic[T]):
 
             with self._lock:
                 self._stats.exhausted_count += 1
-                self._stats.last_exhausted_time = datetime.now(timezone.utc)
+                self._stats.last_exhausted_time = datetime.now(UTC)
 
             logger.error(
                 f"Fallback chain '{self.name}' exhausted all strategies",
@@ -410,8 +395,8 @@ class CachedFallbackStrategy(FallbackStrategy[T]):
     def __init__(
         self,
         name: str = "cached",
-        cache: Optional[dict[str, Any]] = None,
-        cache_key_fn: Optional[Callable[..., str]] = None,
+        cache: dict[str, Any] | None = None,
+        cache_key_fn: Callable[..., str] | None = None,
         ttl: float = 3600.0,  # 1 hour default
     ):
         super().__init__(name=name, is_degraded=True)
@@ -488,8 +473,8 @@ class LambdaFallbackStrategy(FallbackStrategy[T]):
         name: str,
         func: Callable[..., T],
         is_degraded: bool = False,
-        degradation_message: Optional[str] = None,
-        can_handle_fn: Optional[Callable[..., bool]] = None,
+        degradation_message: str | None = None,
+        can_handle_fn: Callable[..., bool] | None = None,
     ):
         super().__init__(name=name, is_degraded=is_degraded)
         self._func = func
@@ -520,7 +505,7 @@ class ModelConfig:
     max_tokens: int = 8192
     temperature: float = 0.7
     is_degraded: bool = False
-    degradation_message: Optional[str] = None
+    degradation_message: str | None = None
 
 
 # Default model fallback chain
@@ -553,8 +538,8 @@ class ModelFallbackChain:
 
     def __init__(
         self,
-        models: Optional[list[ModelConfig]] = None,
-        on_fallback: Optional[Callable[[str, str, Exception], None]] = None,
+        models: list[ModelConfig] | None = None,
+        on_fallback: Callable[[str, str, Exception], None] | None = None,
     ):
         """Initialize model fallback chain.
 
@@ -594,7 +579,7 @@ class ModelFallbackChain:
             },
         ) as span:
             start_time = time.time()
-            last_error: Optional[Exception] = None
+            last_error: Exception | None = None
 
             with self._lock:
                 self._stats.total_calls += 1
@@ -618,13 +603,9 @@ class ModelFallbackChain:
                                 self._stats.primary_successes += 1
                             else:
                                 self._stats.fallback_uses += 1
-                                self._stats.last_fallback_time = datetime.now(
-                                    timezone.utc
-                                )
+                                self._stats.last_fallback_time = datetime.now(UTC)
 
-                            self._stats.strategy_uses[model.name] = (
-                                self._stats.strategy_uses.get(model.name, 0) + 1
-                            )
+                            self._stats.strategy_uses[model.name] = self._stats.strategy_uses.get(model.name, 0) + 1
 
                         if i > 0:
                             logger.warning(
@@ -646,9 +627,7 @@ class ModelFallbackChain:
                             is_degraded=model.is_degraded,
                             degradation_message=model.degradation_message,
                             execution_time=execution_time,
-                            fallback_reason=(
-                                FallbackReason.PRIMARY_FAILED if i > 0 else None
-                            ),
+                            fallback_reason=(FallbackReason.PRIMARY_FAILED if i > 0 else None),
                         )
 
                 except Exception as e:
@@ -671,7 +650,7 @@ class ModelFallbackChain:
 
             with self._lock:
                 self._stats.exhausted_count += 1
-                self._stats.last_exhausted_time = datetime.now(timezone.utc)
+                self._stats.last_exhausted_time = datetime.now(UTC)
 
             logger.error(
                 "Model fallback chain exhausted",
@@ -712,7 +691,7 @@ class ModelFallbackChain:
 
 def create_search_fallback(
     primary_fn: Callable[..., Any],
-    knowledge_base_fn: Optional[Callable[..., Any]] = None,
+    knowledge_base_fn: Callable[..., Any] | None = None,
 ) -> FallbackChain:
     """Create a fallback chain for web search.
 
@@ -764,7 +743,7 @@ def create_search_fallback(
 
 def create_url_reader_fallback(
     primary_fn: Callable[..., Any],
-    knowledge_base_fn: Optional[Callable[..., Any]] = None,
+    knowledge_base_fn: Callable[..., Any] | None = None,
 ) -> FallbackChain:
     """Create a fallback chain for URL reading.
 
@@ -863,7 +842,7 @@ def create_knowledge_search_fallback(
 # ============================================================================
 
 _fallback_chains: dict[str, FallbackChain] = {}
-_model_fallback: Optional[ModelFallbackChain] = None
+_model_fallback: ModelFallbackChain | None = None
 _registry_lock = threading.Lock()
 
 
@@ -878,7 +857,7 @@ def register_fallback_chain(name: str, chain: FallbackChain) -> None:
         _fallback_chains[name] = chain
 
 
-def get_fallback_chain(name: str) -> Optional[FallbackChain]:
+def get_fallback_chain(name: str) -> FallbackChain | None:
     """Get a registered fallback chain.
 
     Args:
@@ -940,7 +919,7 @@ def clear_fallback_registry() -> None:
 
 def with_fallback(
     chain_name: str,
-    chain: Optional[FallbackChain] = None,
+    chain: FallbackChain | None = None,
 ) -> Callable:
     """Decorator to add fallback behavior to a function.
 

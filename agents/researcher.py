@@ -5,8 +5,8 @@ Finds information on specific topics using search, web, and knowledge base tools
 
 from google.adk import Agent
 
-from tools.search import web_search, read_url
 from tools.knowledge import knowledge_search, save_to_knowledge
+from tools.search import read_url, web_search
 
 RESEARCHER_INSTRUCTIONS = """You are a research specialist focused on finding accurate,
 relevant information on specific topics.

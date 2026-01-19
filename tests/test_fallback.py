@@ -4,8 +4,9 @@ Tests the fallback chain and strategy implementations for ResearchCrew.
 """
 
 import time
+from datetime import UTC
+
 import pytest
-from unittest.mock import Mock, patch
 
 
 class TestFallbackChain:
@@ -13,8 +14,8 @@ class TestFallbackChain:
 
     def setup_method(self):
         """Reset state before each test."""
+        from utils import init_metrics, init_tracing, reset_metrics, reset_tracing
         from utils.fallback import clear_fallback_registry
-        from utils import reset_tracing, init_tracing, reset_metrics, init_metrics
 
         clear_fallback_registry()
         reset_tracing()
@@ -24,8 +25,8 @@ class TestFallbackChain:
 
     def teardown_method(self):
         """Reset state after each test."""
+        from utils import reset_metrics, reset_tracing
         from utils.fallback import clear_fallback_registry
-        from utils import reset_tracing, reset_metrics
 
         clear_fallback_registry()
         reset_tracing()
@@ -61,8 +62,8 @@ class TestFallbackChain:
         """Test that fallback is used when primary fails."""
         from utils.fallback import (
             FallbackChain,
-            LambdaFallbackStrategy,
             FallbackReason,
+            LambdaFallbackStrategy,
         )
 
         def failing_primary():
@@ -93,8 +94,8 @@ class TestFallbackChain:
         """Test that FallbackExhaustedError is raised when all strategies fail."""
         from utils.fallback import (
             FallbackChain,
-            LambdaFallbackStrategy,
             FallbackExhaustedError,
+            LambdaFallbackStrategy,
         )
 
         def always_fails():
@@ -208,8 +209,8 @@ class TestFallbackChain:
         """Test that on_exhausted callback is called."""
         from utils.fallback import (
             FallbackChain,
-            LambdaFallbackStrategy,
             FallbackExhaustedError,
+            LambdaFallbackStrategy,
         )
 
         callback_called = False
@@ -413,8 +414,8 @@ class TestModelFallbackChain:
 
     def setup_method(self):
         """Reset state before each test."""
+        from utils import init_metrics, init_tracing, reset_metrics, reset_tracing
         from utils.fallback import clear_fallback_registry
-        from utils import reset_tracing, init_tracing, reset_metrics, init_metrics
 
         clear_fallback_registry()
         reset_tracing()
@@ -424,8 +425,8 @@ class TestModelFallbackChain:
 
     def teardown_method(self):
         """Reset state after each test."""
+        from utils import reset_metrics, reset_tracing
         from utils.fallback import clear_fallback_registry
-        from utils import reset_tracing, reset_metrics
 
         clear_fallback_registry()
         reset_tracing()
@@ -433,7 +434,7 @@ class TestModelFallbackChain:
 
     def test_primary_model_success(self):
         """Test that primary model is used when successful."""
-        from utils.fallback import ModelFallbackChain, ModelConfig
+        from utils.fallback import ModelConfig, ModelFallbackChain
 
         models = [
             ModelConfig(name="primary", model_id="model-1", is_degraded=False),
@@ -453,7 +454,7 @@ class TestModelFallbackChain:
 
     def test_fallback_model_on_failure(self):
         """Test that fallback model is used when primary fails."""
-        from utils.fallback import ModelFallbackChain, ModelConfig
+        from utils.fallback import ModelConfig, ModelFallbackChain
 
         models = [
             ModelConfig(name="primary", model_id="model-1", is_degraded=False),
@@ -487,9 +488,9 @@ class TestModelFallbackChain:
     def test_all_models_fail(self):
         """Test FallbackExhaustedError when all models fail."""
         from utils.fallback import (
-            ModelFallbackChain,
-            ModelConfig,
             FallbackExhaustedError,
+            ModelConfig,
+            ModelFallbackChain,
         )
 
         models = [
@@ -509,7 +510,7 @@ class TestModelFallbackChain:
 
     def test_stats_tracking(self):
         """Test that model stats are tracked."""
-        from utils.fallback import ModelFallbackChain, ModelConfig
+        from utils.fallback import ModelConfig, ModelFallbackChain
 
         models = [
             ModelConfig(name="primary", model_id="model-1"),
@@ -544,8 +545,8 @@ class TestFallbackRegistry:
 
     def setup_method(self):
         """Reset state before each test."""
+        from utils import init_metrics, init_tracing, reset_metrics, reset_tracing
         from utils.fallback import clear_fallback_registry
-        from utils import reset_tracing, init_tracing, reset_metrics, init_metrics
 
         clear_fallback_registry()
         reset_tracing()
@@ -555,8 +556,8 @@ class TestFallbackRegistry:
 
     def teardown_method(self):
         """Reset state after each test."""
+        from utils import reset_metrics, reset_tracing
         from utils.fallback import clear_fallback_registry
-        from utils import reset_tracing, reset_metrics
 
         clear_fallback_registry()
         reset_tracing()
@@ -567,8 +568,8 @@ class TestFallbackRegistry:
         from utils.fallback import (
             FallbackChain,
             LambdaFallbackStrategy,
-            register_fallback_chain,
             get_fallback_chain,
+            register_fallback_chain,
         )
 
         primary = LambdaFallbackStrategy(
@@ -593,8 +594,8 @@ class TestFallbackRegistry:
         from utils.fallback import (
             FallbackChain,
             LambdaFallbackStrategy,
-            register_fallback_chain,
             get_all_fallback_stats,
+            register_fallback_chain,
         )
 
         primary = LambdaFallbackStrategy(name="primary", func=lambda: "result")
@@ -637,9 +638,9 @@ class TestFallbackRegistry:
         from utils.fallback import (
             FallbackChain,
             LambdaFallbackStrategy,
-            register_fallback_chain,
-            get_fallback_chain,
             clear_fallback_registry,
+            get_fallback_chain,
+            register_fallback_chain,
         )
 
         primary = LambdaFallbackStrategy(name="primary", func=lambda: "result")
@@ -657,8 +658,8 @@ class TestWithFallbackDecorator:
 
     def setup_method(self):
         """Reset state before each test."""
+        from utils import init_metrics, init_tracing, reset_metrics, reset_tracing
         from utils.fallback import clear_fallback_registry
-        from utils import reset_tracing, init_tracing, reset_metrics, init_metrics
 
         clear_fallback_registry()
         reset_tracing()
@@ -668,8 +669,8 @@ class TestWithFallbackDecorator:
 
     def teardown_method(self):
         """Reset state after each test."""
+        from utils import reset_metrics, reset_tracing
         from utils.fallback import clear_fallback_registry
-        from utils import reset_tracing, reset_metrics
 
         clear_fallback_registry()
         reset_tracing()
@@ -677,7 +678,7 @@ class TestWithFallbackDecorator:
 
     def test_decorator_wraps_function(self):
         """Test that decorator wraps function."""
-        from utils.fallback import with_fallback, get_fallback_chain
+        from utils.fallback import get_fallback_chain, with_fallback
 
         @with_fallback("test_func")
         def my_function(x):
@@ -694,7 +695,7 @@ class TestWithFallbackDecorator:
 
     def test_decorator_uses_fallback_on_failure(self):
         """Test that decorator falls back on failure."""
-        from utils.fallback import with_fallback, EmptyFallbackStrategy, FallbackChain
+        from utils.fallback import EmptyFallbackStrategy, FallbackChain, with_fallback
 
         fallback_chain = FallbackChain(
             name="existing",
@@ -726,8 +727,8 @@ class TestFallbackFactories:
 
     def setup_method(self):
         """Reset state before each test."""
+        from utils import init_metrics, init_tracing, reset_metrics, reset_tracing
         from utils.fallback import clear_fallback_registry
-        from utils import reset_tracing, init_tracing, reset_metrics, init_metrics
 
         clear_fallback_registry()
         reset_tracing()
@@ -737,8 +738,8 @@ class TestFallbackFactories:
 
     def teardown_method(self):
         """Reset state after each test."""
+        from utils import reset_metrics, reset_tracing
         from utils.fallback import clear_fallback_registry
-        from utils import reset_tracing, reset_metrics
 
         clear_fallback_registry()
         reset_tracing()
@@ -806,7 +807,7 @@ class TestFallbackResult:
 
     def test_to_dict(self):
         """Test FallbackResult serialization."""
-        from utils.fallback import FallbackResult, FallbackReason
+        from utils.fallback import FallbackResult
 
         result = FallbackResult(
             value="test",
@@ -825,7 +826,7 @@ class TestFallbackResult:
 
     def test_to_dict_with_reason(self):
         """Test FallbackResult serialization with reason."""
-        from utils.fallback import FallbackResult, FallbackReason
+        from utils.fallback import FallbackReason, FallbackResult
 
         result = FallbackResult(
             value="test",
@@ -846,10 +847,11 @@ class TestFallbackStats:
 
     def test_to_dict(self):
         """Test FallbackStats serialization."""
-        from utils.fallback import FallbackStats
-        from datetime import datetime, timezone
+        from datetime import datetime
 
-        now = datetime.now(timezone.utc)
+        from utils.fallback import FallbackStats
+
+        now = datetime.now(UTC)
         stats = FallbackStats(
             chain_name="test",
             total_calls=10,
@@ -873,8 +875,8 @@ class TestFallbackReason:
 
     def setup_method(self):
         """Reset state before each test."""
+        from utils import init_metrics, init_tracing, reset_metrics, reset_tracing
         from utils.fallback import clear_fallback_registry
-        from utils import reset_tracing, init_tracing, reset_metrics, init_metrics
 
         clear_fallback_registry()
         reset_tracing()
@@ -884,8 +886,8 @@ class TestFallbackReason:
 
     def teardown_method(self):
         """Reset state after each test."""
+        from utils import reset_metrics, reset_tracing
         from utils.fallback import clear_fallback_registry
-        from utils import reset_tracing, reset_metrics
 
         clear_fallback_registry()
         reset_tracing()
@@ -895,8 +897,8 @@ class TestFallbackReason:
         """Test timeout error classification."""
         from utils.fallback import (
             FallbackChain,
-            LambdaFallbackStrategy,
             FallbackReason,
+            LambdaFallbackStrategy,
         )
 
         def timeout_func():
@@ -914,8 +916,8 @@ class TestFallbackReason:
         """Test rate limit error classification."""
         from utils.fallback import (
             FallbackChain,
-            LambdaFallbackStrategy,
             FallbackReason,
+            LambdaFallbackStrategy,
         )
 
         def rate_limited():
@@ -933,8 +935,8 @@ class TestFallbackReason:
         """Test service unavailable error classification."""
         from utils.fallback import (
             FallbackChain,
-            LambdaFallbackStrategy,
             FallbackReason,
+            LambdaFallbackStrategy,
         )
 
         def unavailable():
