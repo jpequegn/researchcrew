@@ -83,6 +83,26 @@ from utils.debugging import (
     inject_failure_decorator,
     debug_span,
 )
+from utils.resilience import (
+    TransientError,
+    PermanentError,
+    RateLimitError,
+    NetworkError,
+    ServerError,
+    ClientError,
+    AuthenticationError,
+    ValidationError,
+    classify_error,
+    RetryConfig,
+    RetryPolicy,
+    RetryStats,
+    retry_with_backoff,
+    with_timeout,
+    is_retriable,
+    get_retry_wait,
+    get_retry_stats,
+    clear_retry_stats,
+)
 
 __all__ = [
     # Handoff utilities
@@ -157,4 +177,23 @@ __all__ = [
     "get_debug_report",
     "inject_failure_decorator",
     "debug_span",
+    # Resilience
+    "TransientError",
+    "PermanentError",
+    "RateLimitError",
+    "NetworkError",
+    "ServerError",
+    "ClientError",
+    "AuthenticationError",
+    "ValidationError",
+    "classify_error",
+    "RetryConfig",
+    "RetryPolicy",
+    "RetryStats",
+    "retry_with_backoff",
+    "with_timeout",
+    "is_retriable",
+    "get_retry_wait",
+    "get_retry_stats",
+    "clear_retry_stats",
 ]
