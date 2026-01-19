@@ -51,6 +51,28 @@ from utils.tracing import (
     get_trace_id,
     get_span_id,
 )
+from utils.metrics import (
+    init_metrics,
+    reset_metrics,
+    get_metrics_text,
+    record_request_duration,
+    record_token_usage,
+    record_error,
+    update_error_rate,
+    record_tool_call,
+    update_tool_success_rate,
+    record_knowledge_query,
+    update_active_sessions,
+    increment_active_sessions,
+    decrement_active_sessions,
+    metric_tool,
+    metric_agent,
+)
+from utils.logging_config import (
+    configure_logging,
+    get_logger,
+    LogContext,
+)
 
 __all__ = [
     # Handoff utilities
@@ -96,4 +118,24 @@ __all__ = [
     "add_trace_context",
     "get_trace_id",
     "get_span_id",
+    # Metrics
+    "init_metrics",
+    "reset_metrics",
+    "get_metrics_text",
+    "record_request_duration",
+    "record_token_usage",
+    "record_error",
+    "update_error_rate",
+    "record_tool_call",
+    "update_tool_success_rate",
+    "record_knowledge_query",
+    "update_active_sessions",
+    "increment_active_sessions",
+    "decrement_active_sessions",
+    "metric_tool",
+    "metric_agent",
+    # Logging
+    "configure_logging",
+    "get_logger",
+    "LogContext",
 ]
